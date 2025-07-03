@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -18,38 +16,47 @@ class AuthController extends Controller
     }
 
     /**
-     * Menangani permintaan otentikasi.
+     * Menangani permintaan otentikasi menggunakan Guards.
      */
     public function authenticate(Request $request)
     {
-        // 1. Validasi input dasar
         $credentials = $request->validate([
             'username' => ['required', 'string'],
             'password' => ['required'],
             'login_type' => ['required', 'in:marketing,project'],
         ]);
 
-        // 2. Tentukan koneksi database
-        $connection = 'mysql_' . $request->input('login_type');
-        
-        // 3. Set koneksi database secara dinamis
-        Config::set('database.default', $connection);
-        DB::purge($connection);
+        // Tentukan guard mana yang akan digunakan berdasarkan input form
+        $guardName = $request->input('login_type');
 
-        // 4. Lakukan percobaan login
-        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']])) {
+        // Coba login menggunakan guard yang spesifik. Ini adalah perubahan kuncinya.
+        if (Auth::guard($guardName)->attempt(['username' => $credentials['username'], 'password' => $credentials['password']])) {
             $request->session()->regenerate();
 
-            // --- TAMBAHKAN BARIS INI ---
-            // Simpan tipe login ke dalam session agar bisa digunakan di seluruh aplikasi.
-            $request->session()->put('login_type', $request->input('login_type'));
-
-            // Redirect ke dashboard
-            return redirect()->intended('dashboard');
+            // Tidak perlu lagi menyimpan 'login_type' di session.
+            
+            // Redirect langsung ke route dashboard.
+            return redirect()->route('dashboard');
         }
 
-        // 5. Jika otentikasi gagal
-        return back()->with('error', 'Login Gagal! Username atau Password tidak cocok pada database yang dipilih.')
+        // Jika otentikasi gagal
+        return back()->with('error', 'Login Gagal! Username atau Password tidak cocok.')
                      ->withInput($request->only('username', 'login_type'));
+    }
+
+    /**
+     * Log the user out of the application.
+     */
+    public function logout(Request $request)
+    {
+        // Logout dari semua guard yang mungkin aktif untuk keamanan.
+        Auth::guard('web')->logout();
+        Auth::guard('marketing')->logout();
+        Auth::guard('project')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
     }
 }
