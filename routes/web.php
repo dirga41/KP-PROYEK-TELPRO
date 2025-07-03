@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +24,9 @@ Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 
 // Route untuk memproses data login dari form
 Route::post('login', [AuthController::class, 'authenticate'])->name('login.authenticate');
+
+// Route untuk menampilkan dashboard, hanya untuk user yang sudah login
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+
+// Route untuk proses logout
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
