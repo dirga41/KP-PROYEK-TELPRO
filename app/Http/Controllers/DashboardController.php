@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project; // <-- Tambahkan ini untuk mengimpor model Project
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,22 +28,22 @@ class DashboardController extends Controller
         
         $loginType = $activeGuard ?? 'unknown';
 
-        // --- Logika untuk memilih view ---
-        if ($loginType === 'marketing') {
-            // Memuat view khusus untuk marketing
-            return view('dashboards.marketing', [
-                'user' => $user,
-            ]);
+        if ($loginType === 'project') {
+            // Ambil semua data proyek dari database, diurutkan dari yang terbaru
+            $projects = Project::latest()->get();
 
-        } elseif ($loginType === 'project') {
-            
-            // Memuat view khusus untuk project
+            // Memuat view khusus untuk project dan mengirimkan data proyek
             return view('dashboards.project', [
                 'user' => $user,
+                'projects' => $projects, // <-- Kirim data proyek ke view
             ]);
+        } 
+        
+        if ($loginType === 'marketing') {
+            // Logika untuk dashboard marketing (jika diperlukan)
+            return view('dashboards.marketing', ['user' => $user]);
         }
 
-        // Fallback jika tipe login tidak diketahui
         return abort(403, 'Tipe akun tidak valid.');
     }
 }
