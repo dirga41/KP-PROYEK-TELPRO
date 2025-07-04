@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProjectController; // <-- Pastikan untuk mengimpor ProjectController
+
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +32,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 // Route untuk proses logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// --- Route untuk CRUD Project ---
+// Route ini akan secara otomatis membuat semua URL yang diperlukan untuk ProjectController.
+// Kita juga melindunginya dengan middleware 'auth' agar hanya bisa diakses setelah login.
+Route::resource('projects', ProjectController::class)->middleware('auth');
