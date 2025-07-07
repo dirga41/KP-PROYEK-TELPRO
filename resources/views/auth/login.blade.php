@@ -69,10 +69,12 @@
     </div>
 
     <!-- KANAN: GAMBAR -->
-    <div class="hidden lg:block w-1/2 relative">
-        <img src="{{ asset('asset/telpro.png') }}" alt="Telkom Property" class="w-[770px] h-[729px] object-cover">
+    <div class="hidden lg:block w-1/2 relative h-screen">
+        <img src="{{ asset('asset/TLT.jpg') }}" alt="Telkom Property"
+            class="w-full h-full object-cover absolute inset-0">
         <div class="absolute inset-0 bg-gradient-to-tr from-orange-500 to-yellow-300 opacity-70"></div>
     </div>
+
 
 </body>
 
