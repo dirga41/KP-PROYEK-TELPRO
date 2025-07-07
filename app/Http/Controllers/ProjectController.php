@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
+use App\Exports\ProjectsExport;      // <-- Impor kelas export
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends Controller
 {
@@ -92,5 +94,12 @@ class ProjectController extends Controller
 
         // Arahkan kembali ke dashboard dengan fragment #on-hand
         return redirect(route('dashboard') . '#on-hand')->with('success', 'Data proyek berhasil dihapus.');
+    }
+
+    public function export(Request $request)
+    {
+        $request->validate(['ids' => 'required|string']);
+        $projectIds = explode(',', $request->input('ids'));
+        return Excel::download(new ProjectsExport($projectIds), 'projects_export.xlsx');
     }
 }

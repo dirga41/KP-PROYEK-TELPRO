@@ -122,6 +122,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg></span></div>
+                        <button id="exportButton" class="ml-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Export</button>
                         <button id="openInputModal"
                             class="ml-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Input</button>
                     </div>
@@ -149,7 +150,8 @@
                             <tbody id="projectTableBody" class="text-gray-700 text-sm">
                                 @forelse ($projects as $project)
                                 <tr class="project-row border-b border-gray-200 hover:bg-gray-50">
-                                    <td class="py-3 px-6 text-left"><input type="checkbox" class="row-checkbox">
+                                    <!-- PERBAIKAN: Menambahkan data-id untuk fitur export -->
+                                    <td class="py-3 px-6 text-left"><input type="checkbox" class="row-checkbox" data-id="{{ $project->id }}">
                                     </td>
                                     <td class="py-3 px-6 text-left">{{ $project->segment }}</td>
                                     <td class="py-3 px-6 text-left">{{ $project->area }}</td>
@@ -224,7 +226,56 @@
                     </div>
                 </div>
                 <div id="planning-content" data-tab-content="planning" class="tab-content hidden">
-                    <p class="text-gray-600">Konten untuk tab "Project Planning" akan ditampilkan di sini.</p>
+                    <div class="flex justify-end items-center mb-4">
+                        <div class="relative"><input id="planTableSearch" type="text" placeholder="Search" class="border rounded-lg py-2 px-8"><span class="absolute left-2 top-2.5 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg></span></div>
+                        <button id="openPlanInputModal" class="ml-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Input</button>
+                    </div>
+                    @if (session('success') && str_contains(url()->previous(), 'project-plans'))<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-4" role="alert"><span class="block sm:inline">{{ session('success') }}</span></div>@endif
+                    <div class="bg-white shadow-md rounded-lg overflow-x-auto">
+                        <table class="min-w-full leading-normal">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6 text-left">Project</th>
+                                    <th class="py-3 px-6 text-left">User</th>
+                                    <th class="py-3 px-6 text-left">Lokasi</th>
+                                    <th class="py-3 px-6 text-left">Estimasi Nilai</th>
+                                    <th class="py-3 px-6 text-left">Update</th>
+                                    <th class="py-3 px-6 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="planTableBody" class="text-gray-700 text-sm">
+                                @forelse ($projectPlans as $plan)
+                                <tr class="plan-row border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left font-medium">{{ $plan->project }}</td>
+                                    <td class="py-3 px-6 text-left">{{ $plan->user }}</td>
+                                    <td class="py-3 px-6 text-left">{{ $plan->lokasi }}</td>
+                                    <td class="py-3 px-6 text-left">Rp {{ number_format($plan->estimasi_nilai, 0, ',', '.') }}</td>
+                                    <td class="py-3 px-6 text-left">{{ Str::limit($plan->update_info, 50) }}</td>
+                                    <td class="py-3 px-6 text-center">
+                                        <div class="flex item-center justify-center">
+                                            <button data-id="{{ $plan->id }}" class="view-plan-btn w-8 h-8 rounded-full flex items-center justify-center bg-blue-400 hover:bg-blue-500 text-white mr-2" title="View Details"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg></button>
+                                            <button data-id="{{ $plan->id }}" class="edit-plan-btn w-8 h-8 rounded-full flex items-center justify-center bg-yellow-400 hover:bg-yellow-500 text-white mr-2" title="Edit"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536l12.232-12.232z" />
+                                                </svg></button>
+                                            <button data-id="{{ $plan->id }}" class="delete-plan-btn w-8 h-8 rounded-full flex items-center justify-center bg-red-500 hover:bg-red-600 text-white" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-6">Belum ada data perencanaan proyek.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>
@@ -316,6 +367,82 @@
         </div>
     </div>
 
+    <!-- Modal Input Project Plan -->
+    <div id="planInputModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center border-b pb-3 mb-5">
+                <h3 class="text-xl font-semibold text-gray-900">Input Rencana Proyek</h3><button id="closePlanInputModal" class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg></button>
+            </div>
+            <form action="{{ route('project-plans.store') }}" method="POST">
+                @csrf
+                <div class="space-y-4">
+                    <div><label for="plan_project" class="block mb-2 text-sm font-medium text-gray-900">Project</label><input type="text" name="project" id="plan_project" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
+                    <div><label for="plan_user" class="block mb-2 text-sm font-medium text-gray-900">User</label><input type="text" name="user" id="plan_user" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
+                    <div><label for="plan_lokasi" class="block mb-2 text-sm font-medium text-gray-900">Lokasi</label><input type="text" name="lokasi" id="plan_lokasi" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
+                    <div><label for="plan_estimasi_nilai" class="block mb-2 text-sm font-medium text-gray-900">Estimasi Nilai</label><input type="number" name="estimasi_nilai" id="plan_estimasi_nilai" placeholder="Rp" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
+                    <div><label for="plan_update_info" class="block mb-2 text-sm font-medium text-gray-900">Update</label><textarea name="update_info" id="plan_update_info" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea></div>
+                </div>
+                <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end"><button id="cancelPlanInputModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Cancel</button><button type="submit" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Simpan</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Edit Project Plan -->
+    <div id="planEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center border-b pb-3 mb-5">
+                <h3 class="text-xl font-semibold text-gray-900">Edit Rencana Proyek</h3><button id="closePlanEditModal" class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg></button>
+            </div>
+            <form id="planEditForm" action="" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="space-y-4">
+                    <div><label for="edit_plan_project" class="block mb-2 text-sm font-medium text-gray-900">Project</label><input type="text" name="project" id="edit_plan_project" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
+                    <div><label for="edit_plan_user" class="block mb-2 text-sm font-medium text-gray-900">User</label><input type="text" name="user" id="edit_plan_user" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
+                    <div><label for="edit_plan_lokasi" class="block mb-2 text-sm font-medium text-gray-900">Lokasi</label><input type="text" name="lokasi" id="edit_plan_lokasi" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
+                    <div><label for="edit_plan_estimasi_nilai" class="block mb-2 text-sm font-medium text-gray-900">Estimasi Nilai</label><input type="number" name="estimasi_nilai" id="edit_plan_estimasi_nilai" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
+                    <div><label for="edit_plan_update_info" class="block mb-2 text-sm font-medium text-gray-900">Update</label><textarea name="update_info" id="edit_plan_update_info" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea></div>
+                </div>
+                <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end"><button id="cancelPlanEditModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Cancel</button><button type="submit" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Update</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal View Project Plan -->
+    <div id="planViewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center border-b pb-3 mb-5">
+                <h3 class="text-xl font-semibold text-gray-900">Detail Rencana Proyek</h3><button id="closePlanViewModal" class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg></button>
+            </div>
+            <div id="planViewModalContent" class="space-y-2"></div>
+            <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end"><button id="cancelPlanViewModal" type="button" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-white focus:z-10">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Modal Delete Project Plan -->
+    <div id="planDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+            <div class="p-6 text-center">
+                <svg class="mx-auto mb-4 w-14 h-14 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="mb-5 text-lg font-normal text-gray-500">Apakah Anda yakin ingin menghapus rencana ini?</h3>
+                <form id="planDeleteForm" action="" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">Ya, Hapus</button>
+                    <button id="cancelPlanDeleteModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Batal</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Edit Project -->
     <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
@@ -403,6 +530,29 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
+            const exportButton = document.getElementById('exportButton');
+            if (exportButton) {
+                exportButton.addEventListener('click', function() {
+                    const selectedIds = [];
+                    // Kumpulkan ID dari checkbox yang dicentang
+                    document.querySelectorAll('.row-checkbox:checked').forEach(checkbox => {
+                        selectedIds.push(checkbox.dataset.id);
+                    });
+
+                    if (selectedIds.length === 0) {
+                        alert('Silakan pilih setidaknya satu proyek untuk diekspor.');
+                        return;
+                    }
+
+                    // Buat URL untuk ekspor
+                    const url = new URL('{{ route("projects.export") }}');
+                    url.searchParams.append('ids', selectedIds.join(','));
+
+                    // Arahkan browser ke URL ekspor untuk men-download file
+                    window.location.href = url.toString();
+                });
+            }
+
             const selectAllCheckbox = document.getElementById('selectAllCheckbox');
             const rowCheckboxes = document.querySelectorAll('.row-checkbox');
 
@@ -414,6 +564,68 @@
                 });
             }
 
+            //--- FUNGSI FITUR PROJECT PLAN ---
+            const planInputModal = document.getElementById('planInputModal');
+            const openPlanInputBtn = document.getElementById('openPlanInputModal');
+            const closePlanInputBtn = document.getElementById('closePlanInputModal');
+            const cancelPlanInputBtn = document.getElementById('cancelPlanInputModal');
+            if (openPlanInputBtn) openPlanInputBtn.addEventListener('click', () => planInputModal.classList.remove('hidden'));
+            if (closePlanInputBtn) closePlanInputBtn.addEventListener('click', () => planInputModal.classList.add('hidden'));
+            if (cancelPlanInputBtn) cancelPlanInputBtn.addEventListener('click', () => planInputModal.classList.add('hidden'));
+
+            const planEditModal = document.getElementById('planEditModal');
+            const closePlanEditBtn = document.getElementById('closePlanEditModal');
+            const cancelPlanEditBtn = document.getElementById('cancelPlanEditModal');
+            const planEditForm = document.getElementById('planEditForm');
+            document.querySelectorAll('.edit-plan-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const planId = this.dataset.id;
+                    fetch(`/project-plans/${planId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            planEditForm.action = `/project-plans/${planId}`;
+                            document.getElementById('edit_plan_project').value = data.project;
+                            document.getElementById('edit_plan_user').value = data.user;
+                            document.getElementById('edit_plan_lokasi').value = data.lokasi;
+                            document.getElementById('edit_plan_estimasi_nilai').value = parseFloat(data.estimasi_nilai);
+                            document.getElementById('edit_plan_update_info').value = data.update_info;
+                            planEditModal.classList.remove('hidden');
+                        });
+                });
+            });
+            if (closePlanEditBtn) closePlanEditBtn.addEventListener('click', () => planEditModal.classList.add('hidden'));
+            if (cancelPlanEditBtn) cancelPlanEditBtn.addEventListener('click', () => planEditModal.classList.add('hidden'));
+
+            const planViewModal = document.getElementById('planViewModal');
+            const closePlanViewBtn = document.getElementById('closePlanViewModal');
+            const cancelPlanViewBtn = document.getElementById('cancelPlanViewModal');
+            const planViewContent = document.getElementById('planViewModalContent');
+            document.querySelectorAll('.view-plan-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const planId = this.dataset.id;
+                    fetch(`/project-plans/${planId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            planViewContent.innerHTML = `<div class="grid grid-cols-2 gap-4"><p><strong>Project:</strong><br>${data.project}</p><p><strong>User:</strong><br>${data.user}</p><p><strong>Lokasi:</strong><br>${data.lokasi}</p><p><strong>Estimasi Nilai:</strong><br>Rp ${new Intl.NumberFormat('id-ID').format(data.estimasi_nilai)}</p><div class="col-span-2"><p><strong>Update Info:</strong><br>${data.update_info || '-'}</p></div></div>`;
+                            planViewModal.classList.remove('hidden');
+                        });
+                });
+            });
+            if (closePlanViewBtn) closePlanViewBtn.addEventListener('click', () => planViewModal.classList.add('hidden'));
+            if (cancelPlanViewBtn) cancelPlanViewBtn.addEventListener('click', () => planViewModal.classList.add('hidden'));
+
+            const planDeleteModal = document.getElementById('planDeleteModal');
+            const cancelPlanDeleteBtn = document.getElementById('cancelPlanDeleteModal');
+            const planDeleteForm = document.getElementById('planDeleteForm');
+            document.querySelectorAll('.delete-plan-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const planId = this.dataset.id;
+                    planDeleteForm.action = `/project-plans/${planId}`;
+                    planDeleteModal.classList.remove('hidden');
+                });
+            });
+            if (cancelPlanDeleteBtn) cancelPlanDeleteBtn.addEventListener('click', () => planDeleteModal.classList.add('hidden'));
             // --- FUNGSI SEARCH SIDEBAR ---
             const sidebarSearchInput = document.getElementById('sidebarSearchInput');
             if (sidebarSearchInput) {

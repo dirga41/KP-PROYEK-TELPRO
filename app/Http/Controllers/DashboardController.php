@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project; // <-- Tambahkan ini untuk mengimpor model Project
+use App\Models\Project;
+use App\Models\ProjectPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,13 +30,15 @@ class DashboardController extends Controller
         $loginType = $activeGuard ?? 'unknown';
 
         if ($loginType === 'project') {
-            // Ambil semua data proyek dari database, diurutkan dari yang terbaru
+            // Ambil data untuk kedua tabel
             $projects = Project::latest()->get();
+            $projectPlans = ProjectPlan::latest()->get();
 
             // Memuat view khusus untuk project dan mengirimkan data proyek
             return view('dashboards.project', [
                 'user' => $user,
-                'projects' => $projects, // <-- Kirim data proyek ke view
+                'projects' => $projects,
+                'projectPlans' => $projectPlans,
             ]);
         } 
         

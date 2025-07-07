@@ -15,12 +15,16 @@ class PreventBackHistory
      */
     public function handle(Request $request, Closure $next): Response
     {
-        /** @var \Illuminate\Http\Response $response */
         $response = $next($request);
 
-        // Menambahkan header untuk mencegah caching oleh browser
-        return $response->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
-                        ->header('Pragma', 'no-cache')
-                        ->header('Expires', 'Sat, 01 Jan 1990 00:00:00 GMT');
+        // PERBAIKAN: Hanya tambahkan header jika respons mendukungnya
+        // (bukan respons unduhan file seperti BinaryFileResponse).
+        if (method_exists($response, 'header')) {
+            return $response->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+                            ->header('Pragma', 'no-cache')
+                            ->header('Expires', 'Sat, 01 Jan 1990 00:00:00 GMT');
+        }
+
+        return $response;
     }
 }
