@@ -33,7 +33,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi data yang masuk dari form
+        // Validasi data
         $validatedData = $request->validate([
             'segment' => 'required|string|max:255',
             'area' => 'required|string|max:255',
@@ -45,19 +45,24 @@ class ProjectController extends Controller
             'status_progres' => 'required|in:ongoing,closed,closed adm,not started',
         ]);
 
-        // Buat record baru di database menggunakan data yang sudah divalidasi
         Project::create($validatedData);
 
-        // Arahkan kembali ke halaman utama proyek dengan pesan sukses
-        return redirect()->route('projects.index')->with('success', 'Proyek baru berhasil ditambahkan.');
+        // Arahkan kembali ke dashboard dengan fragment #on-hand
+        return redirect(route('dashboard') . '#on-hand')->with('success', 'Proyek baru berhasil ditambahkan.');
+    }
+
+    public function show(Project $project)
+    {
+        // Mengembalikan data proyek sebagai JSON
+        return response()->json($project);
     }
 
     /**
      * Show the form for editing the specified resource.
+     * Metode ini tidak lagi digunakan untuk modal, tapi kita biarkan saja.
      */
     public function edit(Project $project)
     {
-        // Tampilkan view form edit dan kirim data proyek yang akan diedit
         return view('projects.edit', compact('project'));
     }
 
@@ -66,23 +71,16 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        // Validasi data yang masuk dari form edit
+        // Validasi data
         $validatedData = $request->validate([
-            'segment' => 'required|string|max:255',
-            'area' => 'required|string|max:255',
-            'project' => 'required|string|max:255',
-            'no_kontrak' => 'required|string|unique:projects,no_kontrak,' . $project->id,
-            'tanggal_kontrak' => 'required|date',
             'nilai_kontrak' => 'required|numeric',
-            'toc' => 'nullable|date',
             'status_progres' => 'required|in:ongoing,closed,closed adm,not started',
         ]);
 
-        // Update record di database
         $project->update($validatedData);
 
-        // Arahkan kembali ke halaman utama proyek dengan pesan sukses
-        return redirect()->route('projects.index')->with('success', 'Data proyek berhasil diperbarui.');
+        // Arahkan kembali ke dashboard dengan fragment #on-hand
+        return redirect(route('dashboard') . '#on-hand')->with('success', 'Data proyek berhasil diperbarui.');
     }
 
     /**
@@ -90,10 +88,9 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        // Hapus data proyek dari database
         $project->delete();
 
-        // Arahkan kembali ke halaman utama proyek dengan pesan sukses
-        return redirect()->route('projects.index')->with('success', 'Data proyek berhasil dihapus.');
+        // Arahkan kembali ke dashboard dengan fragment #on-hand
+        return redirect(route('dashboard') . '#on-hand')->with('success', 'Data proyek berhasil dihapus.');
     }
 }
