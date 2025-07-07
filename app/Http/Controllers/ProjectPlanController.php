@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ProjectPlan;
 use Illuminate\Http\Request;
+use App\Exports\ProjectPlansExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectPlanController extends Controller
 {
@@ -73,5 +75,19 @@ class ProjectPlanController extends Controller
 
         // Arahkan kembali ke dashboard dengan fragment #planning
         return redirect(route('dashboard') . '#planning')->with('success', 'Data perencanaan proyek berhasil dihapus.');
+    }
+
+    public function export(Request $request)
+    {
+        // Validasi bahwa ada ID yang dikirim
+        $request->validate([
+            'ids' => 'required|string',
+        ]);
+
+        // Ubah string ID menjadi array
+        $planIds = explode(',', $request->input('ids'));
+
+        // Trigger download file Excel
+        return Excel::download(new ProjectPlansExport($planIds), 'project_plans_export.xlsx');
     }
 }

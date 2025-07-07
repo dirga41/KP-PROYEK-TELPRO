@@ -137,12 +137,13 @@
                                     <th class="py-3 px-6 text-left"><input type="checkbox" id="selectAllCheckbox">
                                     </th>
                                     <th class="py-3 px-6 text-left">Segment</th>
-                                    <th class="py-3 px-6 text-left">Area</th>
                                     <th class="py-3 px-6 text-left">Project</th>
                                     <th class="py-3 px-6 text-left">No Kontrak</th>
                                     <th class="py-3 px-6 text-left">Tgl Kontrak</th>
                                     <th class="py-3 px-6 text-left">Nilai</th>
                                     <th class="py-3 px-6 text-left">TOC</th>
+                                    <th class="py-3 px-6 text-left">Area</th>
+                                    <th class="py-3 px-6 text-left">Mitra</th>
                                     <th class="py-3 px-6 text-center">Status Progress</th>
                                     <th class="py-3 px-6 text-center">Actions</th>
                                 </tr>
@@ -154,7 +155,6 @@
                                     <td class="py-3 px-6 text-left"><input type="checkbox" class="row-checkbox" data-id="{{ $project->id }}">
                                     </td>
                                     <td class="py-3 px-6 text-left">{{ $project->segment }}</td>
-                                    <td class="py-3 px-6 text-left">{{ $project->area }}</td>
                                     <td class="py-3 px-6 text-left font-medium">{{ $project->project }}</td>
                                     <td class="py-3 px-6 text-left">{{ $project->no_kontrak }}</td>
                                     <td class="py-3 px-6 text-left">
@@ -166,6 +166,8 @@
                                     <td class="py-3 px-6 text-left">
                                         {{ $project->toc ? $project->toc->format('d M Y') : '-' }}
                                     </td>
+                                    <td class="py-3 px-6 text-left">{{ $project->area }}</td>
+                                    <td class="py-3 px-6 text-left"></td>
                                     <td class="py-3 px-6 text-center">
                                         @if ($project->status_progres == 'ongoing')
                                         <span
@@ -230,30 +232,30 @@
                         <div class="relative"><input id="planTableSearch" type="text" placeholder="Search" class="border rounded-lg py-2 px-8"><span class="absolute left-2 top-2.5 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg></span></div>
+                        <button id="exportPlansButton" class="ml-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Export</button>
                         <button id="openPlanInputModal" class="ml-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Input</button>
                     </div>
                     @if (session('success') && str_contains(url()->previous(), 'project-plans'))<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-4" role="alert"><span class="block sm:inline">{{ session('success') }}</span></div>@endif
                     <div class="bg-white shadow-md rounded-lg overflow-x-auto">
                         <table class="min-w-full leading-normal">
-                            <thead>
-                                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                                    <th class="py-3 px-6 text-left">Project</th>
-                                    <th class="py-3 px-6 text-left">User</th>
-                                    <th class="py-3 px-6 text-left">Lokasi</th>
-                                    <th class="py-3 px-6 text-left">Estimasi Nilai</th>
-                                    <th class="py-3 px-6 text-left">Keterangan</th>
-                                    <th class="py-3 px-6 text-center">Actions</th>
-                                </tr>
-                            </thead>
+                            <thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left"><input type="checkbox" id="selectAllPlansCheckbox"></th>
+                                <th class="py-3 px-6 text-left">Project</th>
+                                <th class="py-3 px-6 text-left">User</th>
+                                <th class="py-3 px-6 text-left">Lokasi</th>
+                                <th class="py-3 px-6 text-left">Estimasi Nilai</th>
+                                <th class="py-3 px-6 text-left">Update</th>
+                                <th class="py-3 px-6 text-center">Actions</th></tr></thead>
                             <tbody id="planTableBody" class="text-gray-700 text-sm">
                                 @forelse ($projectPlans as $plan)
-                                <tr class="plan-row border-b border-gray-200 hover:bg-gray-50">
-                                    <td class="py-3 px-6 text-left font-medium">{{ $plan->project }}</td>
-                                    <td class="py-3 px-6 text-left">{{ $plan->user }}</td>
-                                    <td class="py-3 px-6 text-left">{{ $plan->lokasi }}</td>
-                                    <td class="py-3 px-6 text-left">Rp {{ number_format($plan->estimasi_nilai, 0, ',', '.') }}</td>
-                                    <td class="py-3 px-6 text-left">{{ Str::limit($plan->update_info, 50) }}</td>
-                                    <td class="py-3 px-6 text-center">
+                                    <tr class="plan-row border-b border-gray-200 hover:bg-gray-50">
+                                        <td class="py-3 px-6 text-left"><input type="checkbox" class="plan-row-checkbox" data-id="{{ $plan->id }}"></td>
+                                        <td class="py-3 px-6 text-left font-medium">{{ $plan->project }}</td>
+                                        <td class="py-3 px-6 text-left">{{ $plan->user }}</td>
+                                        <td class="py-3 px-6 text-left">{{ $plan->lokasi }}</td>
+                                        <td class="py-3 px-6 text-left">Rp {{ number_format($plan->estimasi_nilai, 0, ',', '.') }}</td>
+                                        <td class="py-3 px-6 text-left">{{ Str::limit($plan->update_info, 50) }}</td>
+                                        <td class="py-3 px-6 text-center">
                                         <div class="flex item-center justify-center">
                                             <button data-id="{{ $plan->id }}" class="view-plan-btn w-8 h-8 rounded-full flex items-center justify-center bg-blue-400 hover:bg-blue-500 text-white mr-2" title="View Details"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -529,6 +531,37 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+             // --- FUNGSI BARU UNTUK CHECKLIST & EXPORT PROJECT PLANNING ---
+            const selectAllPlansCheckbox = document.getElementById('selectAllPlansCheckbox');
+            const planRowCheckboxes = document.querySelectorAll('.plan-row-checkbox');
+            const exportPlansButton = document.getElementById('exportPlansButton');
+
+            if (selectAllPlansCheckbox) {
+                selectAllPlansCheckbox.addEventListener('change', function() {
+                    planRowCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
+
+            if (exportPlansButton) {
+                exportPlansButton.addEventListener('click', function() {
+                    const selectedIds = [];
+                    document.querySelectorAll('.plan-row-checkbox:checked').forEach(checkbox => {
+                        selectedIds.push(checkbox.dataset.id);
+                    });
+
+                    if (selectedIds.length === 0) {
+                        alert('Silakan pilih setidaknya satu rencana proyek untuk diekspor.');
+                        return;
+                    }
+
+                    const url = new URL('{{ route("project-plans.export") }}');
+                    url.searchParams.append('ids', selectedIds.join(','));
+                    window.location.href = url.toString();
+                });
+            }
 
             const exportButton = document.getElementById('exportButton');
             if (exportButton) {

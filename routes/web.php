@@ -7,7 +7,6 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectPlanController;
 
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,6 +38,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Route ini akan secara otomatis membuat semua URL yang diperlukan untuk ProjectController.
 
 // --- Route BARU untuk Project Planning ---
+Route::get('/project-plans/export', [ProjectPlanController::class, 'export'])->name('project-plans.export')->middleware('auth');
 Route::resource('project-plans', ProjectPlanController::class)->middleware('auth');
 
 
