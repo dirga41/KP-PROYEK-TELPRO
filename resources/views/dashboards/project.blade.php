@@ -57,7 +57,7 @@
                 <div class="bg-white shadow-md rounded-lg overflow-x-auto">
                     <table class="min-w-full leading-normal">
                         <thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                            <th class="py-3 px-6 text-left"><input type="checkbox"></th>
+                            <th class="py-3 px-6 text-left"><input type="checkbox" id="selectAllCheckbox"></th>
                             <th class="py-3 px-6 text-left">Segment</th>
                             <th class="py-3 px-6 text-left">Area</th>
                             <th class="py-3 px-6 text-left">Project</th>
@@ -70,7 +70,7 @@
                         <tbody id="projectTableBody" class="text-gray-700 text-sm">
                             @forelse ($projects as $project)
                                 <tr class="project-row border-b border-gray-200 hover:bg-gray-50">
-                                    <td class="py-3 px-6 text-left"><input type="checkbox"></td>
+                                    <td class="py-3 px-6 text-left"><input type="checkbox" class="row-checkbox"></td>
                                     <td class="py-3 px-6 text-left">{{ $project->segment }}</td>
                                     <td class="py-3 px-6 text-left">{{ $project->area }}</td>
                                     <td class="py-3 px-6 text-left font-medium">{{ $project->project }}</td>
@@ -202,6 +202,18 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+        }
+
         // --- FUNGSI SEARCH SIDEBAR ---
         const sidebarSearchInput = document.getElementById('sidebarSearchInput');
         if (sidebarSearchInput) {
