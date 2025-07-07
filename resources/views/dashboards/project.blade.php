@@ -26,26 +26,21 @@
 
 <body class="bg-gray-50">
 
-    <div class="flex h-screen bg-white">
-        <!-- Sidebar -->
-        <aside class="w-64 flex flex-col p-6 border-r border-gray-200">
-            <!-- Logo -->
-            <div class="mb-8">
-                <img src="https://placehold.co/150x40/E53E3E/FFFFFF?text=Telkom+Property" alt="Logo Perusahaan"
-                    class="h-8 w-auto">
-            </div>
+<div class="flex h-screen bg-white">
+    <!-- Sidebar -->
+    <aside class="w-64 flex flex-col p-6 border-r border-gray-200">
+        <!-- Logo -->
+        <div class="mb-8">
+            <img src="asset/logoTelkomHeader.png" alt="Logo Perusahaan" class="h-8 w-auto">
+        </div>
 
-            <!-- User Profile -->
-            <div class="flex flex-col items-center text-center mb-8">
-                <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-3">
-                    <!-- Placeholder untuk foto profil -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <h2 class="text-lg font-semibold text-gray-800">Hi, {{ $user->name }}!</h2>
+        <!-- User Profile -->
+        <div class="flex flex-col items-center text-center mb-8">
+            <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-3">
+                <!-- Placeholder untuk foto profil -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                </svg>
             </div>
 
             <!-- Search Bar -->
@@ -61,6 +56,17 @@
                     class="w-full pl-10 pr-4 py-2 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
                     placeholder="Search for...">
             </div>
+        <!-- Nav -->
+        <nav id="mainNav" class="flex-grow">
+            <ul>
+                <li class="nav-item mb-2">
+                    <a href="#" class="flex items-center p-3 text-gray-700 bg-red-100 rounded-lg font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                        Dashboard
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
             <!-- Nav -->
             <nav id="mainNav" class="flex-grow">
