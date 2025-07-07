@@ -521,7 +521,7 @@
             if (cancelInputModalBtn) cancelInputModalBtn.addEventListener('click', () => inputModal.classList.add(
                 'hidden'));
 
-            // --- FUNGSI MODAL EDIT --- baru
+            // --- FUNGSI MODAL EDIT --- bar
             const editModal = document.getElementById('editModal');
             const closeEditModalBtn = document.getElementById('closeEditModal');
             const cancelEditModalBtn = document.getElementById('cancelEditModal');
