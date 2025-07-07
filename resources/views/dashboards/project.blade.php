@@ -26,7 +26,7 @@
     <aside class="w-64 flex flex-col p-6 border-r border-gray-200">
         <!-- Logo -->
         <div class="mb-8">
-            <img src="https://placehold.co/150x40/E53E3E/FFFFFF?text=Telkom+Property" alt="Logo Perusahaan" class="h-8 w-auto">
+            <img src="asset/logoTelkomHeader.png" alt="Logo Perusahaan" class="h-8 w-auto">
         </div>
 
         <!-- User Profile -->
