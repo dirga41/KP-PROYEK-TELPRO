@@ -50,7 +50,7 @@ class ProjectPlanController extends Controller
     public function update(Request $request, ProjectPlan $projectPlan)
     {
         // Validasi data yang masuk dari form edit
-         $validatedData = $request->validate([
+        $validatedData = $request->validate([
             'project' => 'required|string|max:255',
             'user' => 'required|string|max:255',
             'lokasi' => 'required|string|max:255',

@@ -7,6 +7,7 @@ use App\Models\ProjectPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\RkapRealization;
 
 class DashboardController extends Controller
 {
@@ -26,22 +27,21 @@ class DashboardController extends Controller
                 break;
             }
         }
-        
+
         $loginType = $activeGuard ?? 'unknown';
 
         if ($loginType === 'project') {
-            // Ambil data untuk kedua tabel
             $projects = Project::latest()->get();
             $projectPlans = ProjectPlan::latest()->get();
-
-            // Memuat view khusus untuk project dan mengirimkan data proyek
+            $rkaps = RkapRealization::orderBy('id')->get();
             return view('dashboards.project', [
                 'user' => $user,
                 'projects' => $projects,
                 'projectPlans' => $projectPlans,
+                'rkaps' => $rkaps, // <-- Kirim data ke view
             ]);
-        } 
-        
+        }
+
         if ($loginType === 'marketing') {
             // Logika untuk dashboard marketing (jika diperlukan)
             return view('dashboards.marketing', ['user' => $user]);

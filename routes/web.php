@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectPlanController;
+use App\Http\Controllers\RkapRealizationController;
+
 
 
 /*
@@ -46,4 +48,5 @@ Route::get('/projects/export', [ProjectController::class, 'export'])->name('proj
 // Kita juga melindunginya dengan middleware 'auth' agar hanya bisa diakses setelah login.
 Route::resource('projects', ProjectController::class)->middleware('auth');
 
-
+Route::get('/rkaps/export', [RkapRealizationController::class, 'export'])->name('rkaps.export')->middleware('auth');
+Route::resource('rkaps', RkapRealizationController::class)->middleware('auth');
