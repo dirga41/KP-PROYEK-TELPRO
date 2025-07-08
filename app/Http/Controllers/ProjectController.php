@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
-use App\Exports\ProjectsExport;      // <-- Impor kelas export
+use App\Exports\ProjectsExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends Controller
@@ -14,10 +14,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        // Ambil semua data proyek dari database, diurutkan dari yang terbaru
         $projects = Project::latest()->get();
-        
-        // Kirim data proyek ke view 'projects.index'
         return view('projects.index', compact('projects'));
     }
 
@@ -26,7 +23,6 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        // Tampilkan view yang berisi form untuk menambah proyek baru
         return view('projects.create');
     }
 
@@ -35,7 +31,8 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi data
+        // --- PERUBAHAN DIMULAI DI SINI ---
+        // Validasi data, termasuk dua kolom baru.
         $validatedData = $request->validate([
             'segment' => 'required|string|max:255',
             'area' => 'required|string|max:255',
@@ -45,23 +42,27 @@ class ProjectController extends Controller
             'nilai_kontrak' => 'required|numeric',
             'toc' => 'nullable|date',
             'status_progres' => 'required|in:ongoing,closed,closed adm,not started',
+            'jenis_pengadaan' => 'nullable|string|in:mitra,swakelola', // Validasi untuk kolom baru
+            'status_panjar' => 'nullable|string|in:Belum Dropping, Mitra, Sudah Dropping',   // Validasi untuk kolom baru
         ]);
+        // --- PERUBAHAN SELESAI DI SINI ---
 
         Project::create($validatedData);
 
-        // Arahkan kembali ke dashboard dengan fragment #on-hand
         return redirect(route('dashboard') . '#on-hand')->with('success', 'Proyek baru berhasil ditambahkan.');
     }
 
+    /**
+     * Display the specified resource.
+     * Metode ini sudah benar, akan mengembalikan semua data termasuk kolom baru dalam format JSON.
+     */
     public function show(Project $project)
     {
-        // Mengembalikan data proyek sebagai JSON
         return response()->json($project);
     }
 
     /**
      * Show the form for editing the specified resource.
-     * Metode ini tidak lagi digunakan untuk modal, tapi kita biarkan saja.
      */
     public function edit(Project $project)
     {
@@ -73,15 +74,20 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        // Validasi data
+        // --- PERUBAHAN DIMULAI DI SINI ---
+        // Validasi data, termasuk kolom yang bisa di-update.
+        // Kita asumsikan semua field ini bisa diubah dari form edit.
         $validatedData = $request->validate([
             'nilai_kontrak' => 'required|numeric',
             'status_progres' => 'required|in:ongoing,closed,closed adm,not started',
+            'jenis_pengadaan' => 'nullable|string|max:255', // Validasi untuk kolom baru
+            'status_panjar' => 'nullable|string|max:255',   // Validasi untuk kolom baru
+            // Tambahkan validasi lain jika diperlukan dari form edit
         ]);
+        // --- PERUBAHAN SELESAI DI SINI ---
 
         $project->update($validatedData);
 
-        // Arahkan kembali ke dashboard dengan fragment #on-hand
         return redirect(route('dashboard') . '#on-hand')->with('success', 'Data proyek berhasil diperbarui.');
     }
 
@@ -91,11 +97,12 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         $project->delete();
-
-        // Arahkan kembali ke dashboard dengan fragment #on-hand
         return redirect(route('dashboard') . '#on-hand')->with('success', 'Data proyek berhasil dihapus.');
     }
 
+    /**
+     * Export selected resources to Excel.
+     */
     public function export(Request $request)
     {
         $request->validate(['ids' => 'required|string']);

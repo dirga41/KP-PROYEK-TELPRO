@@ -35,12 +35,14 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
         return [
             'ID',
             'Segment',
-            'Area',
             'Project',
             'No Kontrak',
             'Tanggal Kontrak',
             'Nilai Kontrak',
             'Tanggal TOC',
+            'Area',
+            'Jenis Pengadaan',
+            'Status Panjar',
             'Status Progres',
             'Dibuat Pada',
         ];
@@ -56,12 +58,14 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
         return [
             $project->id,
             $project->segment,
-            $project->area,
             $project->project,
             $project->no_kontrak,
             $project->tanggal_kontrak->format('d-m-Y'),
             $project->nilai_kontrak,
             $project->toc ? $project->toc->format('d-m-Y') : '-',
+            $project->area,
+            $project->jenis_pengadaan,
+            $project->status_panjar,
             $project->status_progres,
             $project->created_at->format('d-m-Y H:i'),
         ];

@@ -143,7 +143,7 @@
                                     <th class="py-3 px-6 text-left">Nilai</th>
                                     <th class="py-3 px-6 text-left">TOC</th>
                                     <th class="py-3 px-6 text-left">Area</th>
-                                    <th class="py-3 px-6 text-left">Mitra</th>
+                                    <th class="py-3 px-6 text-left">Jenis Pengadaan</th>
                                     <th class="py-3 px-6 text-center">Status Progress</th>
                                     <th class="py-3 px-6 text-center">Actions</th>
                                 </tr>
@@ -151,7 +151,6 @@
                             <tbody id="projectTableBody" class="text-gray-700 text-sm">
                                 @forelse ($projects as $project)
                                 <tr class="project-row border-b border-gray-200 hover:bg-gray-50">
-                                    <!-- PERBAIKAN: Menambahkan data-id untuk fitur export -->
                                     <td class="py-3 px-6 text-left"><input type="checkbox" class="row-checkbox" data-id="{{ $project->id }}">
                                     </td>
                                     <td class="py-3 px-6 text-left">{{ $project->segment }}</td>
@@ -167,7 +166,7 @@
                                         {{ $project->toc ? $project->toc->format('d M Y') : '-' }}
                                     </td>
                                     <td class="py-3 px-6 text-left">{{ $project->area }}</td>
-                                    <td class="py-3 px-6 text-left"></td>
+                                    <td class="py-3 px-6 text-left">{{ $project->jenis_pengadaan ?? '-' }}</td>
                                     <td class="py-3 px-6 text-center">
                                         @if ($project->status_progres == 'ongoing')
                                         <span
@@ -220,7 +219,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="10" class="text-center py-6">Belum ada data proyek.</td>
+                                    <td colspan="12" class="text-center py-6">Belum ada data proyek.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -228,6 +227,7 @@
                     </div>
                 </div>
                 <div id="planning-content" data-tab-content="planning" class="tab-content hidden">
+                    <!-- Konten untuk Project Planning (tidak diubah) -->
                     <div class="flex justify-end items-center mb-4">
                         <div class="relative"><input id="planTableSearch" type="text" placeholder="Search" class="border rounded-lg py-2 px-8"><span class="absolute left-2 top-2.5 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -238,24 +238,27 @@
                     @if (session('success') && str_contains(url()->previous(), 'project-plans'))<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-4" role="alert"><span class="block sm:inline">{{ session('success') }}</span></div>@endif
                     <div class="bg-white shadow-md rounded-lg overflow-x-auto">
                         <table class="min-w-full leading-normal">
-                            <thead><tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                                <th class="py-3 px-6 text-left"><input type="checkbox" id="selectAllPlansCheckbox"></th>
-                                <th class="py-3 px-6 text-left">Project</th>
-                                <th class="py-3 px-6 text-left">User</th>
-                                <th class="py-3 px-6 text-left">Lokasi</th>
-                                <th class="py-3 px-6 text-left">Estimasi Nilai</th>
-                                <th class="py-3 px-6 text-left">Update</th>
-                                <th class="py-3 px-6 text-center">Actions</th></tr></thead>
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6 text-left"><input type="checkbox" id="selectAllPlansCheckbox"></th>
+                                    <th class="py-3 px-6 text-left">Project</th>
+                                    <th class="py-3 px-6 text-left">User</th>
+                                    <th class="py-3 px-6 text-left">Lokasi</th>
+                                    <th class="py-3 px-6 text-left">Estimasi Nilai</th>
+                                    <th class="py-3 px-6 text-left">Update</th>
+                                    <th class="py-3 px-6 text-center">Actions</th>
+                                </tr>
+                            </thead>
                             <tbody id="planTableBody" class="text-gray-700 text-sm">
                                 @forelse ($projectPlans as $plan)
-                                    <tr class="plan-row border-b border-gray-200 hover:bg-gray-50">
-                                        <td class="py-3 px-6 text-left"><input type="checkbox" class="plan-row-checkbox" data-id="{{ $plan->id }}"></td>
-                                        <td class="py-3 px-6 text-left font-medium">{{ $plan->project }}</td>
-                                        <td class="py-3 px-6 text-left">{{ $plan->user }}</td>
-                                        <td class="py-3 px-6 text-left">{{ $plan->lokasi }}</td>
-                                        <td class="py-3 px-6 text-left">Rp {{ number_format($plan->estimasi_nilai, 0, ',', '.') }}</td>
-                                        <td class="py-3 px-6 text-left">{{ Str::limit($plan->update_info, 50) }}</td>
-                                        <td class="py-3 px-6 text-center">
+                                <tr class="plan-row border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="py-3 px-6 text-left"><input type="checkbox" class="plan-row-checkbox" data-id="{{ $plan->id }}"></td>
+                                    <td class="py-3 px-6 text-left font-medium">{{ $plan->project }}</td>
+                                    <td class="py-3 px-6 text-left">{{ $plan->user }}</td>
+                                    <td class="py-3 px-6 text-left">{{ $plan->lokasi }}</td>
+                                    <td class="py-3 px-6 text-left">Rp {{ number_format($plan->estimasi_nilai, 0, ',', '.') }}</td>
+                                    <td class="py-3 px-6 text-left">{{ Str::limit($plan->update_info, 50) }}</td>
+                                    <td class="py-3 px-6 text-center">
                                         <div class="flex item-center justify-center">
                                             <button data-id="{{ $plan->id }}" class="view-plan-btn w-8 h-8 rounded-full flex items-center justify-center bg-blue-400 hover:bg-blue-500 text-white mr-2" title="View Details"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -272,7 +275,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-6">Belum ada data perencanaan proyek.</td>
+                                    <td colspan="7" class="text-center py-6">Belum ada data perencanaan proyek.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -309,21 +312,6 @@
                             <option value="Telkom">Telkom</option>
                         </select>
                     </div>
-                    <div>
-                        <label for="area" class="block mb-2 text-sm font-medium text-gray-900">Area</label>
-                        <select name="area" id="area"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            required>
-                            <option value="Semarang jateng utara">Semarang jateng utara</option>
-                            <option value="Yogya jateng selatan">Yogya jateng selatan</option>
-                            <option value="Solo jateng timur">Solo jateng timur</option>
-                            <option value="Jatim Barat">Jatim Barat</option>
-                            <option value="Suramadu">Suramadu</option>
-                            <option value="Jatim timur">Jatim timur</option>
-                            <option value="Bali">Bali</option>
-                            <option value="Nusra">Nusra</option>
-                        </select>
-                    </div>
                     <div><label for="project"
                             class="block mb-2 text-sm font-medium text-gray-900">Project</label><input type="text"
                             name="project" id="project"
@@ -345,6 +333,41 @@
                     <div><label for="toc" class="block mb-2 text-sm font-medium text-gray-900">TOC</label><input
                             type="date" name="toc" id="toc"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    </div>
+                                        <div>
+                        <label for="area" class="block mb-2 text-sm font-medium text-gray-900">Area</label>
+                        <select name="area" id="area"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            required>
+                            <option value="Semarang jateng utara">Semarang jateng utara</option>
+                            <option value="Yogya jateng selatan">Yogya jateng selatan</option>
+                            <option value="Solo jateng timur">Solo jateng timur</option>
+                            <option value="Jatim Barat">Jatim Barat</option>
+                            <option value="Suramadu">Suramadu</option>
+                            <option value="Jatim timur">Jatim timur</option>
+                            <option value="Bali">Bali</option>
+                            <option value="Nusra">Nusra</option>
+                        </select>
+                    </div>
+                    <!-- PERUBAHAN: Mengubah input menjadi dropdown sesuai permintaan baru -->
+                    <div>
+                        <label for="jenis_pengadaan" class="block mb-2 text-sm font-medium text-gray-900">Jenis Pengadaan</label>
+                        <select name="jenis_pengadaan" id="jenis_pengadaan"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option value="">Pilih Jenis Pengadaan</option>
+                            <option value="mitra">Mitra</option>
+                            <option value="swakelola">Swakelola</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="status_panjar" class="block mb-2 text-sm font-medium text-gray-900">Status Panjar</label>
+                        <select name="status_panjar" id="status_panjar"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option value="">Pilih Status Panjar</option>
+                            <option value="belum drop">Belum Drop</option>
+                            <option value="mitra">Mitra</option>
+                            <option value="sudah drop">Sudah Drop</option>
+                        </select>
                     </div>
                     <div>
                         <label for="status_progres" class="block mb-2 text-sm font-medium text-gray-900">Status
@@ -369,7 +392,7 @@
         </div>
     </div>
 
-    <!-- Modal Input Project Plan -->
+    <!-- Modal Input Project Plan (tidak diubah) -->
     <div id="planInputModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center border-b pb-3 mb-5">
@@ -391,7 +414,7 @@
         </div>
     </div>
 
-    <!-- Modal Edit Project Plan -->
+    <!-- Modal Edit Project Plan (tidak diubah) -->
     <div id="planEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center border-b pb-3 mb-5">
@@ -414,7 +437,7 @@
         </div>
     </div>
 
-    <!-- Modal View Project Plan -->
+    <!-- Modal View Project Plan (tidak diubah) -->
     <div id="planViewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center border-b pb-3 mb-5">
@@ -427,7 +450,7 @@
         </div>
     </div>
 
-    <!-- Modal Delete Project Plan -->
+    <!-- Modal Delete Project Plan (tidak diubah) -->
     <div id="planDeleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
             <div class="p-6 text-center">
@@ -475,6 +498,26 @@
                             <option value="closed">Closed</option>
                             <option value="closed adm">Closed Adm</option>
                         </select></div>
+                    <!-- PERUBAHAN: Mengubah input menjadi dropdown sesuai permintaan baru -->
+                    <div>
+                        <label for="edit_jenis_pengadaan" class="block mb-2 text-sm font-medium text-gray-900">Jenis Pengadaan</label>
+                        <select name="jenis_pengadaan" id="edit_jenis_pengadaan"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option value="">Pilih Jenis Pengadaan</option>
+                            <option value="mitra">Mitra</option>
+                            <option value="swakelola">Swakelola</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit_status_panjar" class="block mb-2 text-sm font-medium text-gray-900">Status Panjar</label>
+                        <select name="status_panjar" id="edit_status_panjar"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            <option value="">Pilih Status Panjar</option>
+                            <option value="belum drop">Belum Drop</option>
+                            <option value="mitra">Mitra</option>
+                            <option value="sudah drop">Sudah Drop</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end">
                     <button id="cancelEditModal" type="button"
@@ -532,7 +575,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-             // --- FUNGSI BARU UNTUK CHECKLIST & EXPORT PROJECT PLANNING ---
+            // --- FUNGSI CHECKLIST & EXPORT ---
+            // (Tidak ada perubahan di sini)
             const selectAllPlansCheckbox = document.getElementById('selectAllPlansCheckbox');
             const planRowCheckboxes = document.querySelectorAll('.plan-row-checkbox');
             const exportPlansButton = document.getElementById('exportPlansButton');
@@ -567,7 +611,6 @@
             if (exportButton) {
                 exportButton.addEventListener('click', function() {
                     const selectedIds = [];
-                    // Kumpulkan ID dari checkbox yang dicentang
                     document.querySelectorAll('.row-checkbox:checked').forEach(checkbox => {
                         selectedIds.push(checkbox.dataset.id);
                     });
@@ -577,11 +620,8 @@
                         return;
                     }
 
-                    // Buat URL untuk ekspor
                     const url = new URL('{{ route("projects.export") }}');
                     url.searchParams.append('ids', selectedIds.join(','));
-
-                    // Arahkan browser ke URL ekspor untuk men-download file
                     window.location.href = url.toString();
                 });
             }
@@ -598,6 +638,7 @@
             }
 
             //--- FUNGSI FITUR PROJECT PLAN ---
+            // (Tidak ada perubahan di sini)
             const planInputModal = document.getElementById('planInputModal');
             const openPlanInputBtn = document.getElementById('openPlanInputModal');
             const closePlanInputBtn = document.getElementById('closePlanInputModal');
@@ -659,24 +700,27 @@
                 });
             });
             if (cancelPlanDeleteBtn) cancelPlanDeleteBtn.addEventListener('click', () => planDeleteModal.classList.add('hidden'));
+
             // --- FUNGSI SEARCH SIDEBAR ---
+            // (Tidak ada perubahan di sini)
             const sidebarSearchInput = document.getElementById('sidebarSearchInput');
             if (sidebarSearchInput) {
-                const navItems = document.querySelectorAll('#mainNav .nav-item');
                 sidebarSearchInput.addEventListener('input', function(e) {
                     const searchTerm = e.target.value.toLowerCase();
+                    const navItems = document.querySelectorAll('nav ul li a');
                     navItems.forEach(item => {
                         const itemText = item.textContent.toLowerCase();
                         if (itemText.includes(searchTerm)) {
-                            item.style.display = 'block';
+                            item.parentElement.style.display = 'block';
                         } else {
-                            item.style.display = 'none';
+                            item.parentElement.style.display = 'none';
                         }
                     });
                 });
             }
 
             // --- FUNGSI SEARCH TABEL ---
+            // (Tidak ada perubahan di sini)
             const projectTableSearch = document.getElementById('projectTableSearch');
             if (projectTableSearch) {
                 const projectTableBody = document.getElementById('projectTableBody');
@@ -695,6 +739,7 @@
             }
 
             // --- FUNGSI TABS ---
+            // (Tidak ada perubahan di sini)
             const tabs = document.querySelectorAll('#tabs .tab-link');
             const tabContents = document.querySelectorAll('.tab-content');
 
@@ -717,62 +762,41 @@
                 }
             }
 
-            // Event listener untuk klik tab
             tabs.forEach(tab => {
                 tab.addEventListener('click', function(e) {
                     e.preventDefault();
                     const tabId = this.dataset.tab;
                     showTab(tabId);
-                    // Update URL hash untuk navigasi yang lebih baik
                     window.location.hash = tabId;
                 });
             });
 
-            // Periksa URL hash saat halaman dimuat untuk membuka tab yang benar
             if (window.location.hash) {
-                const hash = window.location.hash.substring(1); // Hapus tanda #
+                const hash = window.location.hash.substring(1);
                 showTab(hash);
             }
 
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    tabs.forEach(item => {
-                        item.classList.remove('tab-active');
-                        item.classList.add('tab-inactive');
-                    });
-                    this.classList.remove('tab-inactive');
-                    this.classList.add('tab-active');
-                    tabContents.forEach(content => {
-                        content.classList.add('hidden');
-                    });
-                    const targetContent = document.querySelector(
-                        `[data-tab-content="${this.dataset.tab}"]`);
-                    if (targetContent) {
-                        targetContent.classList.remove('hidden');
-                    }
-                });
-            });
-
             // --- FUNGSI MODAL INPUT ---
+            // (Tidak ada perubahan di sini)
             const inputModal = document.getElementById('inputModal');
             const openInputModalBtn = document.getElementById('openInputModal');
             const closeInputModalBtn = document.getElementById('closeInputModal');
             const cancelInputModalBtn = document.getElementById('cancelInputModal');
-            if (openInputModalBtn) openInputModalBtn.addEventListener('click', () => inputModal.classList.remove(
-                'hidden'));
-            if (closeInputModalBtn) closeInputModalBtn.addEventListener('click', () => inputModal.classList.add(
-                'hidden'));
-            if (cancelInputModalBtn) cancelInputModalBtn.addEventListener('click', () => inputModal.classList.add(
-                'hidden'));
+            if (openInputModalBtn) openInputModalBtn.addEventListener('click', () => inputModal.classList.remove('hidden'));
+            if (closeInputModalBtn) closeInputModalBtn.addEventListener('click', () => inputModal.classList.add('hidden'));
+            if (cancelInputModalBtn) cancelInputModalBtn.addEventListener('click', () => inputModal.classList.add('hidden'));
 
-            // --- FUNGSI MODAL EDIT --- bar
+            // --- FUNGSI MODAL EDIT ---
             const editModal = document.getElementById('editModal');
             const closeEditModalBtn = document.getElementById('closeEditModal');
             const cancelEditModalBtn = document.getElementById('cancelEditModal');
             const editForm = document.getElementById('editForm');
             const editNilaiInput = document.getElementById('edit_nilai_kontrak');
             const editStatusSelect = document.getElementById('edit_status_progres');
+            // PERUBAHAN: Menambah variabel untuk dropdown baru
+            const editJenisPengadaanSelect = document.getElementById('edit_jenis_pengadaan');
+            const editStatusPanjarSelect = document.getElementById('edit_status_panjar');
+
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const projectId = this.dataset.id;
@@ -782,14 +806,15 @@
                             editForm.action = `/projects/${projectId}`;
                             editNilaiInput.value = parseFloat(data.nilai_kontrak);
                             editStatusSelect.value = data.status_progres;
+                            // PERUBAHAN: Mengisi nilai untuk dropdown baru
+                            editJenisPengadaanSelect.value = data.jenis_pengadaan || '';
+                            editStatusPanjarSelect.value = data.status_panjar || '';
                             editModal.classList.remove('hidden');
                         });
                 });
             });
-            if (closeEditModalBtn) closeEditModalBtn.addEventListener('click', () => editModal.classList.add(
-                'hidden'));
-            if (cancelEditModalBtn) cancelEditModalBtn.addEventListener('click', () => editModal.classList.add(
-                'hidden'));
+            if (closeEditModalBtn) closeEditModalBtn.addEventListener('click', () => editModal.classList.add('hidden'));
+            if (cancelEditModalBtn) cancelEditModalBtn.addEventListener('click', () => editModal.classList.add('hidden'));
 
             // --- FUNGSI MODAL VIEW ---
             const viewModal = document.getElementById('viewModal');
@@ -802,31 +827,42 @@
                     fetch(`/projects/${projectId}`)
                         .then(response => response.json())
                         .then(data => {
-                            viewModalContent.innerHTML =
-                                `<div class="grid grid-cols-2 gap-4"><p><strong class="font-semibold text-gray-600">Project:</strong><br>${data.project}</p><p><strong class="font-semibold text-gray-600">No Kontrak:</strong><br>${data.no_kontrak}</p><p><strong class="font-semibold text-gray-600">Segment:</strong><br>${data.segment}</p><p><strong class="font-semibold text-gray-600">Area:</strong><br>${data.area}</p><p><strong class="font-semibold text-gray-600">Tanggal Kontrak:</strong><br>${new Date(data.tanggal_kontrak).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</p><p><strong class="font-semibold text-gray-600">Nilai Kontrak:</strong><br>Rp ${new Intl.NumberFormat('id-ID').format(data.nilai_kontrak)}</p><p><strong class="font-semibold text-gray-600">Tanggal TOC:</strong><br>${data.toc ? new Date(data.toc).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-'}</p><p><strong class="font-semibold text-gray-600">Status:</strong><br>${data.status_progres}</p></div>`;
+                            // PERUBAHAN: Memperbarui template HTML untuk menampilkan data baru
+                            viewModalContent.innerHTML = `
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <p><strong class="font-semibold text-gray-600">Project:</strong><br>${data.project || '-'}</p>
+                                    <p><strong class="font-semibold text-gray-600">No Kontrak:</strong><br>${data.no_kontrak || '-'}</p>
+                                    <p><strong class="font-semibold text-gray-600">Segment:</strong><br>${data.segment || '-'}</p>
+                                    <p><strong class="font-semibold text-gray-600">Area:</strong><br>${data.area || '-'}</p>
+                                    <p><strong class="font-semibold text-gray-600">Tanggal Kontrak:</strong><br>${new Date(data.tanggal_kontrak).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                                    <p><strong class="font-semibold text-gray-600">Nilai Kontrak:</strong><br>Rp ${new Intl.NumberFormat('id-ID').format(data.nilai_kontrak)}</p>
+                                    <p><strong class="font-semibold text-gray-600">Tanggal TOC:</strong><br>${data.toc ? new Date(data.toc).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-'}</p>
+                                    <p><strong class="font-semibold text-gray-600">Status:</strong><br>${data.status_progres || '-'}</p>
+                                    <p><strong class="font-semibold text-gray-600">Jenis Pengadaan:</strong><br>${data.jenis_pengadaan || '-'}</p>
+                                    <p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>
+                                </div>
+                            `;
                             viewModal.classList.remove('hidden');
                         });
                 });
             });
-            if (closeViewModalBtn) closeViewModalBtn.addEventListener('click', () => viewModal.classList.add(
-                'hidden'));
-            if (cancelViewModalBtn) cancelViewModalBtn.addEventListener('click', () => viewModal.classList.add(
-                'hidden'));
+            if (closeViewModalBtn) closeViewModalBtn.addEventListener('click', () => viewModal.classList.add('hidden'));
+            if (cancelViewModalBtn) cancelViewModalBtn.addEventListener('click', () => viewModal.classList.add('hidden'));
 
             // --- FUNGSI MODAL DELETE ---
+            // (Tidak ada perubahan di sini)
             const deleteModal = document.getElementById('deleteModal');
             const cancelDeleteModalBtn = document.getElementById('cancelDeleteModal');
             const deleteForm = document.getElementById('deleteForm');
             document.querySelectorAll('.delete-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
-                    e.preventDefault(); // Mencegah form di dalam tabel langsung submit
+                    e.preventDefault();
                     const projectId = this.dataset.id;
                     deleteForm.action = `/projects/${projectId}`;
                     deleteModal.classList.remove('hidden');
                 });
             });
-            if (cancelDeleteModalBtn) cancelDeleteModalBtn.addEventListener('click', () => deleteModal.classList
-                .add('hidden'));
+            if (cancelDeleteModalBtn) cancelDeleteModalBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
         });
     </script>
 

@@ -37,6 +37,8 @@ class Project extends Model
         'nilai_kontrak',
         'toc',
         'status_progres',
+        'jenis_pengadaan', // <-- Tambahkan ini
+        'status_panjar',   // <-- Tambahkan ini
     ];
 
     /**
