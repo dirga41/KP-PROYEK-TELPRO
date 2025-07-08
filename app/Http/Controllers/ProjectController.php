@@ -31,8 +31,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        // --- PERUBAHAN DIMULAI DI SINI ---
-        // Validasi data, termasuk dua kolom baru.
+        // PERBAIKAN: Menambahkan validasi yang lebih spesifik untuk dropdown
         $validatedData = $request->validate([
             'segment' => 'required|string|max:255',
             'area' => 'required|string|max:255',
@@ -42,10 +41,9 @@ class ProjectController extends Controller
             'nilai_kontrak' => 'required|numeric',
             'toc' => 'nullable|date',
             'status_progres' => 'required|in:ongoing,closed,closed adm,not started',
-            'jenis_pengadaan' => 'nullable|string|in:mitra,swakelola', // Validasi untuk kolom baru
-            'status_panjar' => 'nullable|string|in:Belum Dropping, Mitra, Sudah Dropping',   // Validasi untuk kolom baru
+            'jenis_pengadaan' => 'nullable|string|in:mitra,swakelola',
+            'status_panjar' => 'nullable|string|in:belum drop,mitra,sudah drop', // <-- Aturan ini memastikan hanya nilai dari dropdown yang diterima
         ]);
-        // --- PERUBAHAN SELESAI DI SINI ---
 
         Project::create($validatedData);
 
@@ -74,17 +72,13 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        // --- PERUBAHAN DIMULAI DI SINI ---
-        // Validasi data, termasuk kolom yang bisa di-update.
-        // Kita asumsikan semua field ini bisa diubah dari form edit.
+        // PERBAIKAN: Menambahkan validasi yang lebih spesifik saat update
         $validatedData = $request->validate([
             'nilai_kontrak' => 'required|numeric',
             'status_progres' => 'required|in:ongoing,closed,closed adm,not started',
-            'jenis_pengadaan' => 'nullable|string|max:255', // Validasi untuk kolom baru
-            'status_panjar' => 'nullable|string|max:255',   // Validasi untuk kolom baru
-            // Tambahkan validasi lain jika diperlukan dari form edit
+            'jenis_pengadaan' => 'nullable|string|in:mitra,swakelola',
+            'status_panjar' => 'nullable|string|in:belum drop,mitra,sudah drop', // <-- Aturan ini juga diterapkan di sini
         ]);
-        // --- PERUBAHAN SELESAI DI SINI ---
 
         $project->update($validatedData);
 

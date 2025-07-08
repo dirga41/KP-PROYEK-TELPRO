@@ -9,7 +9,8 @@
             initSearch();
             initProjectFeatures();
             initProjectPlanFeatures();
-            initRkapFeatures(); 
+            initRkapFeatures();
+            initOverviewCharts();
         }
 
         /**
@@ -116,34 +117,80 @@
             setupModal('rkapInputModal', '#openRkapInputModal', 'closeRkapInputModal', 'cancelRkapInputModal');
             setupModal('rkapEditModal', '.edit-rkap-btn', 'closeRkapEditModal', 'cancelRkapEditModal', handleRkapEdit);
             setupModal('rkapDeleteModal', '.delete-rkap-btn', null, 'cancelRkapDeleteModal', handleRkapDelete);
-            // setupExport('exportRkapButton', '.rkap-row-checkbox', '{{-- route("rkaps.export") --}}', 'RKAP'); // Aktifkan jika sudah membuat export class
+            setupExport('exportRkapButton', '.rkap-row-checkbox', '{{ route("rkaps.export") }}', 'RKAP');
             setupSelectAll('selectAllRkapCheckbox', '.rkap-row-checkbox');
         }
 
         /**
-         * Fungsi generik untuk setup modal.
+         * Inisialisasi Chart untuk Tab Overview.
+         */
+        function initOverviewCharts() {
+            const chartCanvas = document.getElementById('projectStatusChart');
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js tidak ter-load. Pastikan script tag untuk Chart.js ada dan berhasil dimuat sebelum script ini.');
+                return;
+            }
+
+            if (chartCanvas && chartCanvas.dataset.chartData) {
+                try {
+                    const chartData = JSON.parse(chartCanvas.dataset.chartData);
+                    const segments = Object.keys(chartData);
+                    const statuses = ['ongoing', 'closed', 'closed adm', 'not started'];
+                    const statusLabels = { 'ongoing': 'On Going', 'closed': 'Closed', 'closed adm': 'Closed Adm', 'not started': 'Not Started' };
+                    const statusColors = { 'ongoing': 'rgba(59, 130, 246, 0.7)', 'closed': 'rgba(34, 197, 94, 0.7)', 'closed adm': 'rgba(234, 179, 8, 0.7)', 'not started': 'rgba(156, 163, 175, 0.7)' };
+
+                    const datasets = statuses.map(status => ({
+                        label: statusLabels[status],
+                        data: segments.map(segment => chartData[segment][status] || 0),
+                        backgroundColor: statusColors[status],
+                        borderColor: statusColors[status].replace('0.7', '1'),
+                        borderWidth: 1
+                    }));
+
+                    new Chart(chartCanvas, {
+                        type: 'bar',
+                        data: { labels: segments, datasets: datasets },
+                        options: {
+                            responsive: true,
+                            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } },
+                            plugins: { legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Gagal mem-parsing data chart:", e);
+                }
+            }
+        }
+
+        /**
+         * PERBAIKAN: Fungsi generik untuk setup modal yang lebih robust.
+         * Event listener sekarang ditambahkan langsung ke tombol, bukan ke body.
          */
         function setupModal(modalId, openTriggerSelector, closeBtnId, cancelBtnId, onOpen) {
             const modal = document.getElementById(modalId);
             if (!modal) return;
             
+            const openTriggers = document.querySelectorAll(openTriggerSelector);
             const closeBtn = closeBtnId ? document.getElementById(closeBtnId) : null;
             const cancelBtn = cancelBtnId ? document.getElementById(cancelBtnId) : null;
 
-            document.querySelector('body').addEventListener('click', function(event) {
-                const trigger = event.target.closest(openTriggerSelector);
-                if (trigger) {
-                     if (onOpen) {
-                        event.preventDefault();
-                        onOpen(trigger.dataset.id);
-                    } else {
-                        modal.classList.remove('hidden');
-                    }
+            const openModal = (event) => {
+                if (onOpen) {
+                    event.preventDefault();
+                    onOpen(event.currentTarget.dataset.id);
+                } else {
+                    modal.classList.remove('hidden');
                 }
+            };
+            
+            const closeModal = () => modal.classList.add('hidden');
+
+            openTriggers.forEach(trigger => {
+                trigger.addEventListener('click', openModal);
             });
 
-            if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-            if (cancelBtn) cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
         }
 
         /**
@@ -158,9 +205,14 @@
                         alert(`Silakan pilih setidaknya satu ${itemType} untuk diekspor.`);
                         return;
                     }
-                    const url = new URL(exportUrl);
-                    url.searchParams.append('ids', selectedIds.join(','));
-                    window.location.href = url.toString();
+                    try {
+                        const url = new URL(exportUrl);
+                        url.searchParams.append('ids', selectedIds.join(','));
+                        window.location.href = url.toString();
+                    } catch(e) {
+                        console.error("URL untuk export tidak valid:", exportUrl, e);
+                        alert("Terjadi kesalahan pada fitur export.");
+                    }
                 });
             }
         }
@@ -190,7 +242,6 @@
                     form.action = `/projects/${projectId}`;
                     document.getElementById('edit_nilai_kontrak').value = parseFloat(data.nilai_kontrak);
                     document.getElementById('edit_status_progres').value = data.status_progres;
-                    document.getElementById('edit_mitra').value = data.mitra || '';
                     document.getElementById('edit_jenis_pengadaan').value = data.jenis_pengadaan || '';
                     document.getElementById('edit_status_panjar').value = data.status_panjar || '';
                     modal.classList.remove('hidden');
@@ -217,7 +268,6 @@
                             <p><strong class="font-semibold text-gray-600">Nilai Kontrak:</strong><br>Rp ${nilaiKontrak}</p>
                             <p><strong class="font-semibold text-gray-600">Tanggal TOC:</strong><br>${tglToc}</p>
                             <p><strong class="font-semibold text-gray-600">Status:</strong><br>${data.status_progres || '-'}</p>
-                            <p><strong class="font-semibold text-gray-600">Mitra:</strong><br>${data.mitra || '-'}</p>
                             <p><strong class="font-semibold text-gray-600">Jenis Pengadaan:</strong><br>${data.jenis_pengadaan || '-'}</p>
                             <p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>
                         </div>`;
@@ -274,16 +324,20 @@
             modal.classList.remove('hidden');
         }
         
-        // --- CALLBACKS BARU UNTUK RKAP ---
-
         function handleRkapEdit(rkapId) {
             const modal = document.getElementById('rkapEditModal');
             const form = document.getElementById('rkapEditForm');
             fetch(`/rkaps/${rkapId}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
                 .then(data => {
+                    if (!data || Object.keys(data).length === 0) {
+                        alert('Gagal memuat data. Data yang diterima dari server kosong.');
+                        return;
+                    }
                     form.action = `/rkaps/${rkapId}`;
-                    // PERUBAHAN: Menyesuaikan dengan field form yang baru
                     document.getElementById('edit_rkap_bulan').value = data.bulan;
                     document.getElementById('edit_rkap_periode').value = data.periode;
                     document.getElementById('edit_rkap_value').value = parseFloat(data.rkap_value);

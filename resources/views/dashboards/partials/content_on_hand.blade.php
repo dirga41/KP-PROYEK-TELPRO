@@ -28,9 +28,9 @@
                     <th class="py-3 px-6 text-left">Nilai</th>
                     <th class="py-3 px-6 text-left">TOC</th>
                     <th class="py-3 px-6 text-left">Area</th>
-                    <th class="py-3 px-6 text-left">Mitra</th>
                     <th class="py-3 px-6 text-center">Status Progress</th>
                     <th class="py-3 px-6 text-left">Jenis Pengadaan</th>
+                    <th class="py-3 px-6 text-center">Status Panjar</th> <!-- Diubah ke text-center -->
                     <th class="py-3 px-6 text-center">Actions</th>
                 </tr>
             </thead>
@@ -43,39 +43,47 @@
                     <td class="py-3 px-6 text-left font-medium">{{ $project->project }}</td>
                     <td class="py-3 px-6 text-left">{{ $project->no_kontrak }}</td>
                     <td class="py-3 px-6 text-left">
-                        {{ $project->tanggal_kontrak->format('d M Y') }}
+                        {{ \Carbon\Carbon::parse($project->tanggal_kontrak)->format('d M Y') }}
                     </td>
                     <td class="py-3 px-6 text-left">Rp
                         {{ number_format($project->nilai_kontrak, 0, ',', '.') }}
                     </td>
                     <td class="py-3 px-6 text-left">
-                        {{ $project->toc ? $project->toc->format('d M Y') : '-' }}
+                        {{ $project->toc ? \Carbon\Carbon::parse($project->toc)->format('d M Y') : '-' }}
                     </td>
                     <td class="py-3 px-6 text-left">{{ $project->area }}</td>
-                    <td class="py-3 px-6 text-left">{{ $project->mitra ?? '-' }}</td>
                     <td class="py-3 px-6 text-center">
                         @if ($project->status_progres == 'ongoing')
-                        <span
-                            class="bg-blue-200 text-blue-800 py-1 px-3 rounded-full text-xs">On
-                            Going</span>
+                        <span class="bg-blue-200 text-blue-800 py-1 px-3 rounded-full text-xs">On Going</span>
                         @elseif($project->status_progres == 'closed')
-                        <span
-                            class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs">Closed</span>
+                        <span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs">Closed</span>
                         @elseif($project->status_progres == 'closed adm')
-                        <span
-                            class="bg-yellow-200 text-yellow-800 py-1 px-3 rounded-full text-xs">Closed
-                            Adm</span>@else<span
-                            class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">Not
-                            Started</span>
+                        <span class="bg-yellow-200 text-yellow-800 py-1 px-3 rounded-full text-xs">Closed Adm</span>
+                        @else
+                        <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">Not Started</span>
                         @endif
                     </td>
                     <td class="py-3 px-6 text-left">{{ $project->jenis_pengadaan ?? '-' }}</td>
+                    
+                    <!-- PERBAIKAN: Menampilkan Status Panjar dengan badge dan logika yang benar -->
+                    <td class="py-3 px-6 text-center">
+                        @if ($project->status_panjar == 'belum drop')
+                            <span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Belum Drop</span>
+                        @elseif($project->status_panjar == 'mitra')
+                            <span class="bg-purple-200 text-purple-800 py-1 px-3 rounded-full text-xs">Mitra</span>
+                        @elseif($project->status_panjar == 'sudah drop')
+                            <span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs">Sudah Drop</span>
+                        @else
+                            <span class="text-gray-400">-</span>
+                        @endif
+                    </td>
+
                     <td class="py-3 px-6 text-center">
                         <div class="flex item-center justify-center">
                             <button data-id="{{ $project->id }}"
                                 class="view-btn w-8 h-8 rounded-full flex items-center justify-center bg-blue-400 hover:bg-blue-500 text-white mr-2"
                                 title="View Details"><svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -86,7 +94,7 @@
                             <button data-id="{{ $project->id }}"
                                 class="edit-btn w-8 h-8 rounded-full flex items-center justify-center bg-yellow-400 hover:bg-yellow-500 text-white mr-2"
                                 title="Edit"><svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2"
@@ -95,7 +103,7 @@
                             <button data-id="{{ $project->id }}"
                                 class="delete-btn w-8 h-8 rounded-full flex items-center justify-center bg-red-500 hover:bg-red-600 text-white"
                                 title="Hapus"><svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    class="h-5 w-5 pointer-events-none" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         stroke-width="2"

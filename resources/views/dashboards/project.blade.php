@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -27,23 +29,21 @@
 <body class="bg-gray-50">
 
     <div class="flex h-screen bg-white">
-        
+
         <!-- 1. Memanggil Sidebar -->
         @include('dashboards.partials.sidebar')
 
         <!-- Main Content -->
         <main class="flex-1 flex flex-col overflow-hidden">
-            
+
             <!-- 2. Memanggil Header -->
             @include('dashboards.partials.header')
 
             <!-- Content Area -->
             <div class="flex-1 p-6 overflow-y-auto bg-gray-100">
-                
+
                 <!-- Overview Content -->
-                <div id="overview-content" data-tab-content="overview" class="tab-content">
-                    <p class="text-gray-600">Konten untuk tab "Overview" akan ditampilkan di sini.</p>
-                </div>
+                @include('dashboards.partials.content_overview')
 
                 <!-- 3. Memanggil Konten Tab "On Hand" -->
                 @include('dashboards.partials.content_on_hand')
@@ -52,7 +52,7 @@
                 @include('dashboards.partials.content_planning')
 
                 <!-- 5. Memanggil Konten Tab "RKAP VS Realisasi -->
-                 @include('dashboards.partials.content_rkap_vs_realisasi')
+                @include('dashboards.partials.content_rkap_vs_realisasi')
 
             </div>
         </main>
@@ -63,7 +63,7 @@
 
     <!-- 6. Memanggil Semua Modal untuk Project Plan -->
     @include('dashboards.partials.modals_plan')
-    
+
     <!-- 7. Memanggil Semua Modal untuk Project Plan -->
     @include('dashboards.partials.modals_rkap')
 
@@ -71,4 +71,5 @@
     @include('dashboards.partials.scripts')
 
 </body>
+
 </html>
