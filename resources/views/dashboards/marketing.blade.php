@@ -43,7 +43,7 @@
 </div>
 
 <!-- 4. Memanggil Modal (jika ada) -->
-{{-- @include('dashboards.marketing_partials.modals') --}}
+@include('dashboards.marketing_partials.modals_contract')
 
 <!-- 5. Memanggil Scripts -->
 @include('dashboards.marketing_partials.scripts')

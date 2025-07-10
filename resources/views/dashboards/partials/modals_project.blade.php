@@ -133,15 +133,6 @@
                         <option value="closed">Closed</option>
                         <option value="closed adm">Closed Adm</option>
                     </select></div>
-                <!-- <div>
-                    <label for="edit_mitra" class="block mb-2 text-sm font-medium text-gray-900">Mitra</label>
-                    <select name="mitra" id="edit_mitra"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <option value="">Pilih Mitra</option>
-                        <option value="mitra">Mitra</option>
-                        <option value="swakelola">Swakelola</option>
-                    </select>
-                </div> -->
                 <div>
                     <label for="edit_jenis_pengadaan" class="block mb-2 text-sm font-medium text-gray-900">Jenis Pengadaan</label>
                     <select name="jenis_pengadaan" id="edit_jenis_pengadaan"

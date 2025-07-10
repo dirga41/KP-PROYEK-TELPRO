@@ -269,7 +269,6 @@
                             <p><strong class="font-semibold text-gray-600">Tanggal TOC:</strong><br>${tglToc}</p>
                             <p><strong class="font-semibold text-gray-600">Status:</strong><br>${data.status_progres || '-'}</p>
                             <p><strong class="font-semibold text-gray-600">Jenis Pengadaan:</strong><br>${data.jenis_pengadaan || '-'}</p>
-                            <p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>
                         </div>`;
                     modal.classList.remove('hidden');
                 });

@@ -6,47 +6,44 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectPlanController;
 use App\Http\Controllers\RkapRealizationController;
-
-
+use App\Http\Controllers\ContractController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
 Route::get('/', function () {
     return view('auth.login');
 });
 
-// Route untuk menampilkan halaman login
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-
-// Route untuk memproses data login dari form
 Route::post('login', [AuthController::class, 'authenticate'])->name('login.authenticate');
-
-// Route untuk menampilkan dashboard, hanya untuk user yang sudah login
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
-
-// Route untuk proses logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// --- Route untuk CRUD Project ---
-// Route ini akan secara otomatis membuat semua URL yang diperlukan untuk ProjectController.
+// Middleware Group untuk semua halaman yang memerlukan autentikasi
+Route::middleware(['auth'])->group(function () {
+    
+    // PERUBAHAN: Rute dasbor yang lebih spesifik
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard'); // Rute default
+    Route::get('/dashboard/marketing', [DashboardController::class, 'showMarketingDashboard'])->name('dashboard.marketing');
+    Route::get('/dashboard/project', [DashboardController::class, 'showProjectDashboard'])->name('dashboard.project');
+    Route::get('/dashboard/marketing/asset', [DashboardController::class, 'showMarketingAssetDashboard'])->name('dashboard.marketing.asset');
 
-// --- Route BARU untuk Project Planning ---
-Route::get('/project-plans/export', [ProjectPlanController::class, 'export'])->name('project-plans.export')->middleware('auth');
-Route::resource('project-plans', ProjectPlanController::class)->middleware('auth');
+    // Rute untuk Project
+    Route::get('/projects/export', [ProjectController::class, 'export'])->name('projects.export');
+    Route::resource('projects', ProjectController::class);
 
+    // Rute untuk Project Plan
+    Route::get('/project-plans/export', [ProjectPlanController::class, 'export'])->name('project-plans.export');
+    Route::resource('project-plans', ProjectPlanController::class);
 
-Route::get('/projects/export', [ProjectController::class, 'export'])->name('projects.export')->middleware('auth');
-// Kita juga melindunginya dengan middleware 'auth' agar hanya bisa diakses setelah login.
-Route::resource('projects', ProjectController::class)->middleware('auth');
+    // Rute untuk RKAP
+    Route::get('/rkaps/export', [RkapRealizationController::class, 'export'])->name('rkaps.export');
+    Route::resource('rkaps', RkapRealizationController::class);
 
-Route::get('/rkaps/export', [RkapRealizationController::class, 'export'])->name('rkaps.export')->middleware('auth');
-Route::resource('rkaps', RkapRealizationController::class)->middleware('auth');
+    // Rute untuk Contract
+    Route::get('/contracts/export', [ContractController::class, 'exportSelected'])->name('contracts.export');
+    Route::resource('contracts', ContractController::class);
+});
