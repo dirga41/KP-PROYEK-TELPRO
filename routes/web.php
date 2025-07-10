@@ -24,10 +24,15 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Middleware Group untuk semua halaman yang memerlukan autentikasi
 Route::middleware(['auth'])->group(function () {
+
+    // Rute dasbor umum
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard'); 
     
-    // PERUBAHAN: Rute dasbor yang lebih spesifik
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard'); // Rute default
-    Route::get('/dashboard/marketing', [DashboardController::class, 'showMarketingDashboard'])->name('dashboard.marketing');
+    // --- PERUBAHAN KUNCI ---
+    // Rute ini sekarang mengarah ke ContractController@index, tempat logika dasbor berada.
+    Route::get('/dashboard/marketing', [ContractController::class, 'index'])->name('dashboard.marketing');
+    
+    // Rute dasbor lain (jika diperlukan)
     Route::get('/dashboard/project', [DashboardController::class, 'showProjectDashboard'])->name('dashboard.project');
     Route::get('/dashboard/marketing/asset', [DashboardController::class, 'showMarketingAssetDashboard'])->name('dashboard.marketing.asset');
 
@@ -43,7 +48,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/rkaps/export', [RkapRealizationController::class, 'export'])->name('rkaps.export');
     Route::resource('rkaps', RkapRealizationController::class);
 
-    // Rute untuk Contract
+    // --- PERAPIHAN RUTE KONTRAK ---
+    // Route::resource() sudah secara otomatis membuat rute untuk index, create, store, show, edit, update, dan destroy.
+    // Jadi, kita tidak perlu mendefinisikannya secara manual lagi. Cukup tambahkan rute custom seperti 'export'.
     Route::get('/contracts/export', [ContractController::class, 'exportSelected'])->name('contracts.export');
-    Route::resource('contracts', ContractController::class);
+    Route::resource('contracts', ContractController::class)->except(['index']); 
+    // Kita tambahkan except(['index']) karena rute index utama sekarang adalah /dashboard/marketing
 });

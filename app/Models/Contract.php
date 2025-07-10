@@ -19,6 +19,8 @@ class Contract extends Model
         'start_date',
         'end_date',
         'status',
+        'nilai_kontrak', // <-- PERUBAHAN KUNCI: Tambahkan baris ini
+
     ];
 
     protected $casts = [

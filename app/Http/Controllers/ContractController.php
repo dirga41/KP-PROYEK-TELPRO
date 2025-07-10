@@ -5,13 +5,70 @@ namespace App\Http\Controllers;
 use App\Models\Contract;
 use Illuminate\Http\Request;
 use App\Exports\ContractsExport;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ContractController extends Controller
 {
+    /**
+     * Menampilkan halaman dasbor utama dengan semua data yang diperlukan.
+     */
     public function index()
     {
-        return redirect()->route('dashboard', ['#contract']);
+        // --- DATA UNTUK TAB "DATABASE CONTRACT" ---
+        $contracts = Contract::latest()->get();
+
+        // --- DATA UNTUK TAB "OVERVIEW" ---
+
+        // 1. Data untuk Chart Revenue Per-Segment
+        $totalContracts = $contracts->count();
+        $segmentCounts = Contract::select('segment', DB::raw('count(*) as count'))
+            ->groupBy('segment')
+            ->get();
+
+        $segmentColors = [
+            'Telkom' => 'text-orange-500',
+            'Enterprise' => 'text-purple-500',
+            'Subs & Afiliasi' => 'text-yellow-400',
+            'Government' => 'text-green-500',
+        ];
+
+        $segmentData = $segmentCounts->map(function ($item) use ($totalContracts, $segmentColors) {
+            return [
+                'name' => $item->segment,
+                'percentage' => ($totalContracts > 0) ? round(($item->count / $totalContracts) * 100) : 0,
+                'color' => $segmentColors[$item->segment] ?? 'text-gray-400'
+            ];
+        });
+
+        // 2. Data untuk Top 10 Revenue Tenant
+        $topRevenueTenants = collect(); 
+        if (Schema::hasColumn('contracts', 'nilai_kontrak')) {
+            $topRevenueTenants = Contract::select('tenant_name as name', DB::raw('SUM(nilai_kontrak) as value'))
+                ->where('nilai_kontrak', '>', 0)
+                ->groupBy('tenant_name')
+                ->orderByDesc('value')
+                ->take(10)
+                ->get();
+        }
+
+        // 3. Data untuk Top 10 Kontrak yang Akan Berakhir (dalam 90 hari ke depan)
+        $expiringContracts = Contract::where('status', '!=', 'berakhir')
+            ->where('end_date', '<=', now()->addDays(90))
+            ->orderBy('end_date', 'asc')
+            ->take(10)
+            ->get();
+        
+        // --- PERUBAHAN KUNCI ---
+        // Mengembalikan path view ke notasi titik, sesuai petunjuk error Laravel.
+        // Ini berarti Laravel mencari file 'marketing.blade.php' di dalam folder 'resources/views/dashboards/'.
+        return view('dashboards.marketing', compact(
+            'contracts', 
+            'segmentData', 
+            'topRevenueTenants', 
+            'expiringContracts'
+        ));
     }
 
     public function store(Request $request)
@@ -26,13 +83,12 @@ class ContractController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:aktif,akan berakhir,berakhir',
+            'nilai_kontrak' => 'required|numeric|min:0',
         ]);
 
         Contract::create($validatedData);
 
-        // PERUBAHAN: Redirect kembali ke dashboard dengan hash #contract 
-        // agar tab yang benar tetap aktif setelah input data.
-        return redirect(route('dashboard') . '#contract')->with('success_contract', 'Data kontrak baru berhasil ditambahkan.');
+        return redirect(route('dashboard.marketing') . '#contract')->with('success_contract', 'Data kontrak baru berhasil ditambahkan.');
     }
 
     public function show(Contract $contract)
@@ -52,27 +108,21 @@ class ContractController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|in:aktif,akan berakhir,berakhir',
+            'nilai_kontrak' => 'required|numeric|min:0',
         ]);
 
         $contract->update($validatedData);
 
-        // PERUBAHAN: Redirect kembali ke dashboard dengan hash #contract 
-        // agar tab yang benar tetap aktif setelah update data.
-        return redirect(route('dashboard') . '#contract')->with('success_contract', 'Data kontrak berhasil diperbarui.');
+        return redirect(route('dashboard.marketing') . '#contract')->with('success_contract', 'Data kontrak berhasil diperbarui.');
     }
 
     public function destroy(Contract $contract)
     {
         $contract->delete();
         
-        // PERUBAHAN: Redirect kembali ke dashboard dengan hash #contract 
-        // agar tab yang benar tetap aktif setelah hapus data.
-        return redirect(route('dashboard') . '#contract')->with('success_contract', 'Data kontrak berhasil dihapus.');
+        return redirect(route('dashboard.marketing') . '#contract')->with('success_contract', 'Data kontrak berhasil dihapus.');
     }
 
-    /**
-     * METODE YANG DIPERBARUI: Mengekspor data yang dipilih sebagai file Excel.
-     */
     public function exportSelected(Request $request)
     {
         $request->validate([
@@ -81,17 +131,14 @@ class ContractController extends Controller
 
         $ids = explode(',', $request->query('ids'));
         
-        // Membersihkan dan memvalidasi array ID
         $sanitizedIds = array_filter(array_map('intval', $ids), fn($id) => $id > 0);
 
         if (empty($sanitizedIds)) {
-            return redirect(route('dashboard') . '#contract')->with('error_contract', 'Tidak ada data valid yang dipilih untuk diekspor.');
+            return redirect(route('dashboard.marketing') . '#contract')->with('error_contract', 'Tidak ada data valid yang dipilih untuk diekspor.');
         }
 
         $fileName = 'contracts_export_' . date('Y-m-d_H-i-s') . '.xlsx';
 
-        // PERUBAHAN KUNCI: Langsung kirim array ID ke class export.
-        // Class ContractsExport akan menangani query ke database.
         return Excel::download(new ContractsExport($sanitizedIds), $fileName);
     }
 }

@@ -53,6 +53,8 @@
                     <th class="py-3 px-6 text-left">Segment</th>
                     <th class="py-3 px-6 text-left">Portfolio</th>
                     <th class="py-3 px-6 text-center">Tahun Kontrak</th>
+                    {{-- PERUBAHAN: Menambahkan header kolom untuk Nilai Kontrak --}}
+                    <th class="py-3 px-6 text-right">Nilai Kontrak</th>
                     <th class="py-3 px-6 text-center">Awal</th>
                     <th class="py-3 px-6 text-center">Akhir</th>
                     <th class="py-3 px-6 text-center">Status Kontrak</th>
@@ -71,6 +73,8 @@
                     <td class="py-3 px-6 text-left">{{ $contract->segment }}</td>
                     <td class="py-3 px-6 text-left">{{ $contract->portfolio }}</td>
                     <td class="py-3 px-6 text-center">{{ $contract->tahun_kontrak }}</td>
+                    {{-- PERUBAHAN: Menampilkan data nilai_kontrak yang diformat --}}
+                    <td class="py-3 px-6 text-right font-medium">Rp. {{ number_format($contract->nilai_kontrak, 0, ',', '.') }}</td>
                     <td class="py-3 px-6 text-center">{{ $contract->start_date->format('d-m-Y') }}</td>
                     <td class="py-3 px-6 text-center">{{ $contract->end_date->format('d-m-Y') }}</td>
                     <td class="py-3 px-6 text-center">
@@ -95,7 +99,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="10" class="text-center py-6">Belum ada data kontrak.</td>
+                    <td colspan="11" class="text-center py-6">Belum ada data kontrak.</td>
                 </tr>
                 @endforelse
             </tbody>
