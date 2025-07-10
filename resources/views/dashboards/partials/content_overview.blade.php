@@ -23,31 +23,54 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-         <!-- Card Jumlah Project -->
-        <div class="bg-white p-6 rounded-xl shadow-md">
-            <h3 class="font-semibold text-gray-800 mb-4">Jumlah Project</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-600">Project On Hand</span>
-                    <span class="font-bold text-lg text-blue-600">{{ $projectOnHandCount }} Proyek</span>
-                </div>
-                 <div class="flex justify-between items-center">
-                    <span class="text-gray-600">Project Planning</span>
-                    <span class="font-bold text-lg text-purple-600">{{ $projectPlanningCount }} Rencana</span>
-                </div>
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-center">
+            <div class="grid grid-cols-3 gap-x-4">
+                {{-- Headers --}}
+                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Kategori</div>
+                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Jumlah Project</div>
+                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Nilai</div>
+
+                {{-- Row On Hand --}}
+                <div class="py-3 px-2 font-medium text-gray-700">On Hand</div>
+                <div class="py-3 px-2 text-center text-gray-700">{{ $projectOnHandCount }} Project</div>
+                <div class="py-3 px-2 text-right font-mono text-gray-700">Rp {{ number_format($projectOnHandValue, 0, ',', '.') }}</div>
+
+                {{-- Row Planning --}}
+                <div class="py-3 px-2 font-medium text-gray-700">Planning</div>
+                <div class="py-3 px-2 text-center text-gray-700">{{ $projectPlanningCount }} Rencana</div>
+                <div class="py-3 px-2 text-right font-mono text-gray-700">Rp {{ number_format($projectPlanningValue, 0, ',', '.') }}</div>
+
+                {{-- Row Total --}}
+                <div class="py-3 px-2 font-bold text-gray-800 border-t-2 border-gray-200">Total</div>
+                <div class="py-3 px-2 text-center font-bold text-gray-800 border-t-2 border-gray-200">{{ $projectOnHandCount + $projectPlanningCount }} Project</div>
+                <div class="py-3 px-2 text-right font-bold font-mono text-gray-800 border-t-2 border-gray-200">Rp {{ number_format($projectOnHandValue + $projectPlanningValue, 0, ',', '.') }}</div>
             </div>
         </div>
-        <!-- Card Nilai Project -->
+
         <div class="bg-white p-6 rounded-xl shadow-md">
-            <h3 class="font-semibold text-gray-800 mb-4">Total Nilai Project</h3>
-            <div class="space-y-4">
+            <h3 class="font-semibold text-gray-800 mb-4">Perbandingan Nilai (On Hand vs Planning)</h3>
+            {{-- Elemen Canvas untuk Chart --}}
+            <div class="relative mx-auto" style="max-width: 280px; max-height: 280px;">
+                <canvas id="valueComparisonChart"
+                    data-on-hand-value="{{ $projectOnHandValue }}"
+                    data-planning-value="{{ $projectPlanningValue }}">
+                </canvas>
+            </div>
+            {{-- Legend Kustom --}}
+            <div id="valueChartLegend" class="mt-4 space-y-2 text-sm">
                 <div class="flex justify-between items-center">
-                    <span class="text-gray-600">On Hand (Kontrak)</span>
-                    <span class="font-bold text-lg text-green-600">Rp {{ number_format($projectOnHandValue, 0, ',', '.') }}</span>
+                    <div>
+                        <span class="inline-block w-3 h-3 mr-2 rounded-full" style="background-color: #F7C59F;"></span>
+                        <span class="text-gray-600">On Hand</span>
+                    </div>
+                    <span class="font-semibold font-mono">Rp {{ number_format($projectOnHandValue, 0, ',', '.') }}</span>
                 </div>
-                 <div class="flex justify-between items-center">
-                    <span class="text-gray-600">Planning (Estimasi)</span>
-                    <span class="font-bold text-lg text-yellow-600">Rp {{ number_format($projectPlanningValue, 0, ',', '.') }}</span>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="inline-block w-3 h-3 mr-2 rounded-full" style="background-color: #D35400;"></span>
+                        <span class="text-gray-600">Planning</span>
+                    </div>
+                    <span class="font-semibold font-mono">Rp {{ number_format($projectPlanningValue, 0, ',', '.') }}</span>
                 </div>
             </div>
         </div>

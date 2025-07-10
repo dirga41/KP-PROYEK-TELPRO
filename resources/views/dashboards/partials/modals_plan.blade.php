@@ -24,21 +24,32 @@
 <div id="planEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
     <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
         <div class="flex justify-between items-center border-b pb-3 mb-5">
-            <h3 class="text-xl font-semibold text-gray-900">Edit Rencana Proyek</h3><button id="closePlanEditModal" class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <h3 class="text-xl font-semibold text-gray-900">Edit Project Planning</h3>
+            <button id="closePlanEditModal" class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                </svg></button>
+                </svg>
+            </button>
         </div>
         <form id="planEditForm" action="" method="POST">
             @csrf
             @method('PUT')
             <div class="space-y-4">
-                <div><label for="edit_plan_project" class="block mb-2 text-sm font-medium text-gray-900">Project</label><input type="text" name="project" id="edit_plan_project" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
-                <div><label for="edit_plan_user" class="block mb-2 text-sm font-medium text-gray-900">User</label><input type="text" name="user" id="edit_plan_user" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
-                <div><label for="edit_plan_lokasi" class="block mb-2 text-sm font-medium text-gray-900">Lokasi</label><input type="text" name="lokasi" id="edit_plan_lokasi" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
-                <div><label for="edit_plan_estimasi_nilai" class="block mb-2 text-sm font-medium text-gray-900">Estimasi Nilai</label><input type="number" name="estimasi_nilai" id="edit_plan_estimasi_nilai" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required></div>
-                <div><label for="edit_plan_update_info" class="block mb-2 text-sm font-medium text-gray-900">Update</label><textarea name="update_info" id="edit_plan_update_info" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></textarea></div>
+                {{-- Field Keterangan --}}
+                <div>
+                    <label for="edit_plan_update_info" class="block mb-2 text-sm font-medium text-gray-900">Keterangan</label>
+                    <input type="text" name="update_info" id="edit_plan_update_info" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5">
+                </div>
+                {{-- Field Estimasi Nilai --}}
+                <div>
+                    <label for="edit_plan_estimasi_nilai" class="block mb-2 text-sm font-medium text-gray-900">Estimasi Nilai</label>
+                    <input type="number" name="estimasi_nilai" id="edit_plan_estimasi_nilai" placeholder="Rp" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5" required>
+                </div>
             </div>
-            <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end"><button id="cancelPlanEditModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Cancel</button><button type="submit" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Update</button></div>
+            <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end">
+                <button id="cancelPlanEditModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Cancel</button>
+                <button type="submit" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Update</button>
+            </div>
         </form>
     </div>
 </div>

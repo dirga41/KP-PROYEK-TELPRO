@@ -10,7 +10,7 @@
             initProjectFeatures();
             initProjectPlanFeatures();
             initRkapFeatures();
-            initOverviewCharts();
+            initOverviewCharts(); // Fungsi ini yang kita modifikasi
         }
 
         /**
@@ -131,13 +131,24 @@
                 return;
             }
 
+            // Kode untuk chart batang (yang sudah ada)
             if (chartCanvas && chartCanvas.dataset.chartData) {
                 try {
                     const chartData = JSON.parse(chartCanvas.dataset.chartData);
                     const segments = Object.keys(chartData);
                     const statuses = ['ongoing', 'closed', 'closed adm', 'not started'];
-                    const statusLabels = { 'ongoing': 'On Going', 'closed': 'Closed', 'closed adm': 'Closed Adm', 'not started': 'Not Started' };
-                    const statusColors = { 'ongoing': 'rgba(59, 130, 246, 0.7)', 'closed': 'rgba(34, 197, 94, 0.7)', 'closed adm': 'rgba(234, 179, 8, 0.7)', 'not started': 'rgba(156, 163, 175, 0.7)' };
+                    const statusLabels = {
+                        'ongoing': 'On Going',
+                        'closed': 'Closed',
+                        'closed adm': 'Closed Adm',
+                        'not started': 'Not Started'
+                    };
+                    const statusColors = {
+                        'ongoing': 'rgba(59, 130, 246, 0.7)',
+                        'closed': 'rgba(34, 197, 94, 0.7)',
+                        'closed adm': 'rgba(234, 179, 8, 0.7)',
+                        'not started': 'rgba(156, 163, 175, 0.7)'
+                    };
 
                     const datasets = statuses.map(status => ({
                         label: statusLabels[status],
@@ -149,15 +160,100 @@
 
                     new Chart(chartCanvas, {
                         type: 'bar',
-                        data: { labels: segments, datasets: datasets },
+                        data: {
+                            labels: segments,
+                            datasets: datasets
+                        },
                         options: {
                             responsive: true,
-                            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } },
-                            plugins: { legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } }
+                            scales: {
+                                x: {
+                                    stacked: true
+                                },
+                                y: {
+                                    stacked: true,
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false
+                                }
+                            }
                         }
                     });
                 } catch (e) {
                     console.error("Gagal mem-parsing data chart:", e);
+                }
+            }
+
+            // =================================================================
+            // KODE BARU: Inisialisasi untuk Chart Doughnut Perbandingan Nilai
+            // =================================================================
+            const valueChartCanvas = document.getElementById('valueComparisonChart');
+            if (valueChartCanvas) {
+                try {
+                    const onHandValue = parseFloat(valueChartCanvas.dataset.onHandValue) || 0;
+                    const planningValue = parseFloat(valueChartCanvas.dataset.planningValue) || 0;
+                    const totalValue = onHandValue + planningValue;
+
+                    new Chart(valueChartCanvas, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['On Hand', 'Planning'],
+                            datasets: [{
+                                label: 'Nilai Project',
+                                data: [onHandValue, planningValue],
+                                backgroundColor: [
+                                    '#F7C59F', // Warna untuk On Hand (oranye muda)
+                                    '#D35400' // Warna untuk Planning (oranye tua)
+                                ],
+                                borderColor: '#FFFFFF', // Memberi sedikit spasi antar-segmen
+                                borderWidth: 4,
+                                hoverOffset: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%', // Membuat lubang di tengah sehingga menjadi doughnut chart
+                            plugins: {
+                                // Menonaktifkan legend bawaan karena kita sudah membuat legend kustom
+                                legend: {
+                                    display: false
+                                },
+                                // Konfigurasi tooltip untuk menampilkan persentase
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw || 0;
+                                            const percentage = totalValue > 0 ? ((value / totalValue) * 100).toFixed(0) : 0;
+                                            const formattedValue = new Intl.NumberFormat('id-ID', {
+                                                style: 'currency',
+                                                currency: 'IDR',
+                                                minimumFractionDigits: 0
+                                            }).format(value);
+
+                                            // Menampilkan persentase di dalam tooltip
+                                            context.chart.options.plugins.tooltip.title = `${percentage}%`;
+
+                                            return ` ${label}: ${formattedValue}`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Gagal membuat chart perbandingan nilai:", e);
                 }
             }
         }
@@ -169,7 +265,7 @@
         function setupModal(modalId, openTriggerSelector, closeBtnId, cancelBtnId, onOpen) {
             const modal = document.getElementById(modalId);
             if (!modal) return;
-            
+
             const openTriggers = document.querySelectorAll(openTriggerSelector);
             const closeBtn = closeBtnId ? document.getElementById(closeBtnId) : null;
             const cancelBtn = cancelBtnId ? document.getElementById(cancelBtnId) : null;
@@ -182,7 +278,7 @@
                     modal.classList.remove('hidden');
                 }
             };
-            
+
             const closeModal = () => modal.classList.add('hidden');
 
             openTriggers.forEach(trigger => {
@@ -209,7 +305,7 @@
                         const url = new URL(exportUrl);
                         url.searchParams.append('ids', selectedIds.join(','));
                         window.location.href = url.toString();
-                    } catch(e) {
+                    } catch (e) {
                         console.error("URL untuk export tidak valid:", exportUrl, e);
                         alert("Terjadi kesalahan pada fitur export.");
                     }
@@ -232,7 +328,7 @@
         }
 
         // --- CALLBACKS UNTUK MODAL ---
-        
+
         function handleProjectEdit(projectId) {
             const modal = document.getElementById('editModal');
             const form = document.getElementById('editForm');
@@ -254,8 +350,16 @@
             fetch(`/projects/${projectId}`)
                 .then(response => response.json())
                 .then(data => {
-                    const tglKontrak = new Date(data.tanggal_kontrak).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
-                    const tglToc = data.toc ? new Date(data.toc).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
+                    const tglKontrak = new Date(data.tanggal_kontrak).toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                    const tglToc = data.toc ? new Date(data.toc).toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    }) : '-';
                     const nilaiKontrak = new Intl.NumberFormat('id-ID').format(data.nilai_kontrak);
 
                     content.innerHTML = `
@@ -288,11 +392,11 @@
                 .then(response => response.json())
                 .then(data => {
                     form.action = `/project-plans/${planId}`;
-                    document.getElementById('edit_plan_project').value = data.project;
-                    document.getElementById('edit_plan_user').value = data.user;
-                    document.getElementById('edit_plan_lokasi').value = data.lokasi;
+
+                    // Mengisi data hanya untuk field yang ada
                     document.getElementById('edit_plan_estimasi_nilai').value = parseFloat(data.estimasi_nilai);
                     document.getElementById('edit_plan_update_info').value = data.update_info;
+
                     modal.classList.remove('hidden');
                 });
         }
@@ -322,7 +426,7 @@
             form.action = `/project-plans/${planId}`;
             modal.classList.remove('hidden');
         }
-        
+
         function handleRkapEdit(rkapId) {
             const modal = document.getElementById('rkapEditModal');
             const form = document.getElementById('rkapEditForm');
