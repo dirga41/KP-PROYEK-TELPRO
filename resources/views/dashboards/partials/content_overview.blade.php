@@ -1,95 +1,86 @@
-<!-- Content Panel: Overview -->
 <div id="overview-content" data-tab-content="overview" class="tab-content">
-    
-    <!-- Baris Atas: Revenue & Top Tenant -->
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
-        <!-- Kartu: Jumlah Revenue Per-Segment -->
-        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-            <h3 class="font-bold text-lg text-gray-800 mb-4">Jumlah Revenue Per-Segment</h3>
-            @if(isset($segmentData) && $segmentData->isNotEmpty())
-                <div class="flex items-center justify-center space-x-6">
-                    <!-- Donut Chart Dinamis -->
-                    <div class="relative w-40 h-40">
-                        <svg class="w-full h-full" viewBox="0 0 36 36" transform="rotate(-90)">
-                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                  fill="none" stroke="#e5e7eb" stroke-width="4" />
-                            
-                            @php $offset = 0; @endphp
-                            @foreach ($segmentData as $segment)
-                                <path class="{{ $segment['color'] }}"
-                                      stroke="currentColor" stroke-width="4" fill="none"
-                                      stroke-dasharray="{{ $segment['percentage'] }}, 100" 
-                                      stroke-dashoffset="-{{ $offset }}"
-                                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                @php $offset += $segment['percentage']; @endphp
-                            @endforeach
-                        </svg>
-                    </div>
-                    <!-- Legenda Dinamis -->
-                    <div class="text-sm text-gray-600">
-                        <ul>
-                            @foreach ($segmentData as $segment)
-                                <li class="flex items-center mb-2">
-                                    <span class="w-3 h-3 rounded-full {{ str_replace('text-', 'bg-', $segment['color']) }} mr-2"></span>
-                                    <span>{{ $segment['name'] }} ({{ $segment['percentage'] }}%)</span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            @else
-                <div class="text-center py-10 text-gray-500">Data segment tidak tersedia.</div>
-            @endif
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Card RKAP Q1 -->
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col">
+            <h3 class="text-sm font-semibold text-gray-500">RKAP Q1</h3>
+            <p class="text-2xl font-bold text-gray-800 mt-2">Rp {{ number_format($rkapSummary['Q1'] ?? 0, 0, ',', '.') }}</p>
         </div>
-
-        <!-- Kartu: Top 10 Revenue Tenant -->
-        <div class="lg:col-span-3 bg-white p-6 rounded-lg shadow-md">
-            <h3 class="font-bold text-lg text-gray-800 mb-4">Top 10 Revenue Tenant</h3>
-            <div class="flex flex-col">
-                <div class="flex bg-orange-500 text-white font-bold p-2 rounded-t-lg">
-                    <div class="w-1/12 text-center">No</div>
-                    <div class="w-7/12 pl-2">Tenant</div>
-                    <div class="w-4/12 text-right pr-4">Nilai Kontrak</div>
-                </div>
-                <div class="max-h-48 overflow-y-auto">
-                    @forelse ($topRevenueTenants ?? [] as $index => $tenant)
-                        <div class="flex items-center p-2 border-b border-gray-200 hover:bg-gray-50">
-                            <div class="w-1/12 text-center text-gray-600">{{ $index + 1 }}.</div>
-                            <div class="w-7/12 pl-2 font-medium text-gray-800">{{ $tenant->name }}</div>
-                            <div class="w-4/12 text-right pr-4 text-gray-700">Rp. {{ number_format($tenant->value, 0, ',', '.') }}</div>
-                        </div>
-                    @empty
-                        <div class="text-center py-4 text-gray-500">Data tenant tidak tersedia.</div>
-                    @endforelse
-                </div>
-            </div>
+        <!-- Card RKAP Q2 -->
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col">
+            <h3 class="text-sm font-semibold text-gray-500">RKAP Q2</h3>
+            <p class="text-2xl font-bold text-gray-800 mt-2">Rp {{ number_format($rkapSummary['Q2'] ?? 0, 0, ',', '.') }}</p>
         </div>
-
+        <!-- Card RKAP Q3 -->
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col">
+            <h3 class="text-sm font-semibold text-gray-500">RKAP Q3</h3>
+            <p class="text-2xl font-bold text-gray-800 mt-2">Rp {{ number_format($rkapSummary['Q3'] ?? 0, 0, ',', '.') }}</p>
+        </div>
+        <!-- Card RKAP Q4 -->
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col">
+            <h3 class="text-sm font-semibold text-gray-500">RKAP Q4</h3>
+            <p class="text-2xl font-bold text-gray-800 mt-2">Rp {{ number_format($rkapSummary['Q4'] ?? 0, 0, ',', '.') }}</p>
+        </div>
     </div>
 
-    <!-- Baris Bawah: Kontrak Akan Berakhir -->
-    <div class="mt-6">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="font-bold text-lg text-gray-800 mb-4">Top 10 Kontrak yang Akan Berakhir</h3>
-             <div class="flex flex-col">
-                <div class="flex bg-orange-500 text-white font-bold p-2 rounded-t-lg">
-                    <div class="w-1/12 text-center">No</div>
-                    <div class="w-7/12 pl-2">Tenant</div>
-                    <div class="w-4/12 text-center">Tanggal Akhir</div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-center">
+            <div class="grid grid-cols-3 gap-x-4">
+                {{-- Headers --}}
+                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Kategori</div>
+                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Jumlah Project</div>
+                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Nilai</div>
+
+                {{-- Row On Hand --}}
+                <div class="py-3 px-2 font-medium text-gray-700">On Hand</div>
+                <div class="py-3 px-2 text-center text-gray-700">{{ $projectOnHandCount }} Project</div>
+                <div class="py-3 px-2 text-right font-mono text-gray-700">Rp {{ number_format($projectOnHandValue, 0, ',', '.') }}</div>
+
+                {{-- Row Planning --}}
+                <div class="py-3 px-2 font-medium text-gray-700">Planning</div>
+                <div class="py-3 px-2 text-center text-gray-700">{{ $projectPlanningCount }} Rencana</div>
+                <div class="py-3 px-2 text-right font-mono text-gray-700">Rp {{ number_format($projectPlanningValue, 0, ',', '.') }}</div>
+
+                {{-- Row Total --}}
+                <div class="py-3 px-2 font-bold text-gray-800 border-t-2 border-gray-200">Total</div>
+                <div class="py-3 px-2 text-center font-bold text-gray-800 border-t-2 border-gray-200">{{ $projectOnHandCount + $projectPlanningCount }} Project</div>
+                <div class="py-3 px-2 text-right font-bold font-mono text-gray-800 border-t-2 border-gray-200">Rp {{ number_format($projectOnHandValue + $projectPlanningValue, 0, ',', '.') }}</div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <h3 class="font-semibold text-gray-800 mb-4">Perbandingan Nilai (On Hand vs Planning)</h3>
+            {{-- Elemen Canvas untuk Chart --}}
+            <div class="relative mx-auto" style="max-width: 280px; max-height: 280px;">
+                <canvas id="valueComparisonChart"
+                    data-on-hand-value="{{ $projectOnHandValue }}"
+                    data-planning-value="{{ $projectPlanningValue }}">
+                </canvas>
+            </div>
+            {{-- Legend Kustom --}}
+            <div id="valueChartLegend" class="mt-4 space-y-2 text-sm">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="inline-block w-3 h-3 mr-2 rounded-full" style="background-color: #F7C59F;"></span>
+                        <span class="text-gray-600">On Hand</span>
+                    </div>
+                    <span class="font-semibold font-mono">Rp {{ number_format($projectOnHandValue, 0, ',', '.') }}</span>
                 </div>
-                <div class="max-h-48 overflow-y-auto">
-                     @forelse ($expiringContracts ?? [] as $index => $contract)
-                        <div class="flex items-center p-2 border-b border-gray-200 hover:bg-gray-50">
-                            <div class="w-1/12 text-center text-gray-600">{{ $index + 1 }}.</div>
-                            <div class="w-7/12 pl-2 font-medium text-gray-800">{{ $contract->tenant_name }}</div>
-                            <div class="w-4/12 text-center text-gray-700">{{ $contract->end_date->format('d-m-Y') }}</div>
-                        </div>
-                    @empty
-                        <div class="text-center py-4 text-gray-500">Tidak ada kontrak yang akan berakhir.</div>
-                    @endforelse
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="inline-block w-3 h-3 mr-2 rounded-full" style="background-color: #D35400;"></span>
+                        <span class="text-gray-600">Planning</span>
+                    </div>
+                    <span class="font-semibold font-mono">Rp {{ number_format($projectPlanningValue, 0, ',', '.') }}</span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-md">
+        <h3 class="font-semibold text-gray-800 mb-4">Update Progress per Segment</h3>
+        <div>
+            <canvas id="projectStatusChart" data-chart-data="{{ json_encode($projectStatusBySegment) }}"></canvas>
         </div>
     </div>
 </div>
