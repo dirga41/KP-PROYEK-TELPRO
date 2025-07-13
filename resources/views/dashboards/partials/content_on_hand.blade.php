@@ -29,8 +29,8 @@
                     <th class="py-3 px-6 text-center">TOC</th>
                     <th class="py-3 px-6 text-center">Area</th>
                     <th class="py-3 px-6 text-center">Status Progress</th>
-                    <th class="py-3 px-6 text-center">Jenis Pengadaan</th>
-                    <!-- <th class="py-3 px-6 text-center">Status CRM</th> -->
+                    <!-- [FIX] Menambahkan kolom baru untuk Tahap CRM -->
+                    <th class="py-3 px-6 text-center">Tahap CRM</th>
                     <th class="py-3 px-6 text-center">Actions</th>
                 </tr>
             </thead>
@@ -63,21 +63,10 @@
                         <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">Not Started</span>
                         @endif
                     </td>
-                    <td class="py-3 px-6 text-left">{{ $project->jenis_pengadaan ?? '-' }}</td>
-                    
-                    <!-- PERBAIKAN: Menampilkan Status Panjar dengan badge dan logika yang benar -->
-                        <!-- <td class="py-3 px-6 text-center">
-                            @if ($project->status_panjar == 'belum drop')
-                                <span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Belum Drop</span>
-                            @elseif($project->status_panjar == 'mitra')
-                                <span class="bg-purple-200 text-purple-800 py-1 px-3 rounded-full text-xs">Mitra</span>
-                            @elseif($project->status_panjar == 'sudah drop')
-                                <span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs">Sudah Drop</span>
-                            @else
-                                <span class="text-gray-400">-</span>
-                            @endif
-                        </td> -->
-
+                    <!-- [FIX] Menampilkan data dari accessor yang sudah dibuat -->
+                    <td class="py-3 px-6 text-center font-medium">
+                        <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">{{ $project->current_crm_stage }}</span>
+                    </td>
                     <td class="py-3 px-6 text-center">
                         <div class="flex item-center justify-center">
                             <button data-id="{{ $project->id }}"

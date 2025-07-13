@@ -1,6 +1,11 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
+        // Global reference untuk chart agar bisa dihancurkan
+        let crmChart = null;
+        // Global reference untuk fungsi update validasi timeline
+        let updateTimelineValidationState = () => {};
+
         /**
          * Menginisialisasi semua fungsionalitas pada halaman.
          */
@@ -10,7 +15,7 @@
             initProjectFeatures();
             initProjectPlanFeatures();
             initRkapFeatures();
-            initOverviewCharts(); // Fungsi ini yang kita modifikasi
+            initOverviewCharts();
         }
 
         /**
@@ -96,6 +101,45 @@
             setupModal('deleteModal', '.delete-btn', null, 'cancelDeleteModal', handleProjectDelete);
             setupExport('exportButton', '.row-checkbox', '{{ route("projects.export") }}', 'proyek');
             setupSelectAll('selectAllCheckbox', '.row-checkbox');
+            // Panggil fungsi setup untuk validasi timeline
+            updateTimelineValidationState = setupTimelineValidation();
+        }
+
+        /**
+         * Fungsi untuk setup validasi urutan tanggal pada timeline CRM.
+         */
+        function setupTimelineValidation() {
+            const timelineInputIds = [
+                'edit_spk_date', 'edit_leads_date', 'edit_approval_jib_date',
+                'edit_contract_date', 'edit_procurement_juskeb_date',
+                'edit_procurement_rb_date', 'edit_procurement_juspeng_date'
+            ];
+            const timelineInputs = timelineInputIds.map(id => document.getElementById(id));
+
+            const updateStates = () => {
+                let previousInputHasValue = true;
+                for (const input of timelineInputs) {
+                    if (!input) continue; // Lewati jika elemen tidak ditemukan
+
+                    if (previousInputHasValue) {
+                        input.disabled = false;
+                        input.title = ''; // Hapus tooltip jika aktif
+                    } else {
+                        input.disabled = true;
+                        input.title = 'Harap isi tahap sebelumnya terlebih dahulu.'; // Tambahkan tooltip sebagai petunjuk
+                    }
+                    previousInputHasValue = !!input.value;
+                }
+            };
+
+            timelineInputs.forEach(input => {
+                if (input) {
+                    input.addEventListener('input', updateStates);
+                }
+            });
+
+            // Kembalikan fungsi agar bisa dipanggil saat modal dibuka
+            return updateStates;
         }
 
         /**
@@ -131,7 +175,6 @@
                 return;
             }
 
-            // Kode untuk chart batang (yang sudah ada)
             if (chartCanvas && chartCanvas.dataset.chartData) {
                 try {
                     const chartData = JSON.parse(chartCanvas.dataset.chartData);
@@ -149,7 +192,6 @@
                         'closed adm': 'rgba(234, 179, 8, 0.7)',
                         'not started': 'rgba(156, 163, 175, 0.7)'
                     };
-
                     const datasets = statuses.map(status => ({
                         label: statusLabels[status],
                         data: segments.map(segment => chartData[segment][status] || 0),
@@ -157,7 +199,6 @@
                         borderColor: statusColors[status].replace('0.7', '1'),
                         borderWidth: 1
                     }));
-
                     new Chart(chartCanvas, {
                         type: 'bar',
                         data: {
@@ -194,16 +235,12 @@
                 }
             }
 
-            // =================================================================
-            // KODE BARU: Inisialisasi untuk Chart Doughnut Perbandingan Nilai
-            // =================================================================
             const valueChartCanvas = document.getElementById('valueComparisonChart');
             if (valueChartCanvas) {
                 try {
                     const onHandValue = parseFloat(valueChartCanvas.dataset.onHandValue) || 0;
                     const planningValue = parseFloat(valueChartCanvas.dataset.planningValue) || 0;
                     const totalValue = onHandValue + planningValue;
-
                     new Chart(valueChartCanvas, {
                         type: 'doughnut',
                         data: {
@@ -211,11 +248,8 @@
                             datasets: [{
                                 label: 'Nilai Project',
                                 data: [onHandValue, planningValue],
-                                backgroundColor: [
-                                    '#F7C59F', // Warna untuk On Hand (oranye muda)
-                                    '#D35400' // Warna untuk Planning (oranye tua)
-                                ],
-                                borderColor: '#FFFFFF', // Memberi sedikit spasi antar-segmen
+                                backgroundColor: ['#F7C59F', '#D35400'],
+                                borderColor: '#FFFFFF',
                                 borderWidth: 4,
                                 hoverOffset: 8
                             }]
@@ -223,13 +257,11 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            cutout: '70%', // Membuat lubang di tengah sehingga menjadi doughnut chart
+                            cutout: '70%',
                             plugins: {
-                                // Menonaktifkan legend bawaan karena kita sudah membuat legend kustom
                                 legend: {
                                     display: false
                                 },
-                                // Konfigurasi tooltip untuk menampilkan persentase
                                 tooltip: {
                                     callbacks: {
                                         label: function(context) {
@@ -241,10 +273,7 @@
                                                 currency: 'IDR',
                                                 minimumFractionDigits: 0
                                             }).format(value);
-
-                                            // Menampilkan persentase di dalam tooltip
                                             context.chart.options.plugins.tooltip.title = `${percentage}%`;
-
                                             return ` ${label}: ${formattedValue}`;
                                         }
                                     }
@@ -258,18 +287,12 @@
             }
         }
 
-        /**
-         * PERBAIKAN: Fungsi generik untuk setup modal yang lebih robust.
-         * Event listener sekarang ditambahkan langsung ke tombol, bukan ke body.
-         */
         function setupModal(modalId, openTriggerSelector, closeBtnId, cancelBtnId, onOpen) {
             const modal = document.getElementById(modalId);
             if (!modal) return;
-
             const openTriggers = document.querySelectorAll(openTriggerSelector);
             const closeBtn = closeBtnId ? document.getElementById(closeBtnId) : null;
             const cancelBtn = cancelBtnId ? document.getElementById(cancelBtnId) : null;
-
             const openModal = (event) => {
                 if (onOpen) {
                     event.preventDefault();
@@ -278,20 +301,12 @@
                     modal.classList.remove('hidden');
                 }
             };
-
             const closeModal = () => modal.classList.add('hidden');
-
-            openTriggers.forEach(trigger => {
-                trigger.addEventListener('click', openModal);
-            });
-
+            openTriggers.forEach(trigger => trigger.addEventListener('click', openModal));
             if (closeBtn) closeBtn.addEventListener('click', closeModal);
             if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
         }
 
-        /**
-         * Fungsi generik untuk setup export.
-         */
         function setupExport(buttonId, checkboxSelector, exportUrl, itemType) {
             const exportBtn = document.getElementById(buttonId);
             if (exportBtn) {
@@ -313,9 +328,6 @@
             }
         }
 
-        /**
-         * Fungsi generik untuk setup "pilih semua".
-         */
         function setupSelectAll(selectAllId, rowCheckboxSelector) {
             const selectAll = document.getElementById(selectAllId);
             if (selectAll) {
@@ -332,6 +344,11 @@
         function handleProjectEdit(projectId) {
             const modal = document.getElementById('editModal');
             const form = document.getElementById('editForm');
+            const formatDateForInput = (dateString) => {
+                if (!dateString) return '';
+                return new Date(dateString).toISOString().slice(0, 10);
+            };
+
             fetch(`/projects/${projectId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -340,6 +357,42 @@
                     document.getElementById('edit_status_progres').value = data.status_progres;
                     document.getElementById('edit_jenis_pengadaan').value = data.jenis_pengadaan || '';
                     document.getElementById('edit_status_panjar').value = data.status_panjar || '';
+
+                    // [FIX] Mengatur batas min dan max untuk semua input tanggal linimasa
+                    const minDate = formatDateForInput(data.tanggal_kontrak);
+                    const maxDate = formatDateForInput(data.toc);
+
+                    const timelineInputIds = [
+                        'edit_spk_date', 'edit_leads_date', 'edit_approval_jib_date',
+                        'edit_contract_date', 'edit_procurement_juskeb_date',
+                        'edit_procurement_rb_date', 'edit_procurement_juspeng_date'
+                    ];
+
+                    timelineInputIds.forEach(id => {
+                        const input = document.getElementById(id);
+                        if (input) {
+                            if (minDate) {
+                                input.min = minDate;
+                            }
+                            if (maxDate) {
+                                input.max = maxDate;
+                            }
+                        }
+                    });
+
+                    // Mengisi nilai tanggal yang sudah ada
+                    document.getElementById('edit_toc_date').value = formatDateForInput(data.toc);
+                    document.getElementById('edit_spk_date').value = formatDateForInput(data.spk_date);
+                    document.getElementById('edit_leads_date').value = formatDateForInput(data.leads_date);
+                    document.getElementById('edit_approval_jib_date').value = formatDateForInput(data.approval_jib_date);
+                    document.getElementById('edit_contract_date').value = formatDateForInput(data.contract_date);
+                    document.getElementById('edit_procurement_juskeb_date').value = formatDateForInput(data.procurement_juskeb_date);
+                    document.getElementById('edit_procurement_rb_date').value = formatDateForInput(data.procurement_rb_date);
+                    document.getElementById('edit_procurement_juspeng_date').value = formatDateForInput(data.procurement_juspeng_date);
+
+                    // Panggil fungsi untuk mengatur status awal input (disabled/enabled)
+                    updateTimelineValidationState();
+
                     modal.classList.remove('hidden');
                 });
         }
@@ -374,6 +427,74 @@
                             <p><strong class="font-semibold text-gray-600">Status:</strong><br>${data.status_progres || '-'}</p>
                             <p><strong class="font-semibold text-gray-600">Jenis Pengadaan:</strong><br>${data.jenis_pengadaan || '-'}</p>
                         </div>`;
+
+                    try {
+                        const ctx = document.getElementById('crmTimelineChart').getContext('2d');
+                        if (crmChart) {
+                            crmChart.destroy();
+                        }
+
+                        const timelineLabels = ['SPK', 'LEADS', 'APPROVAL JIB', 'CONTRACT', 'PROCUREMENT - JUSKEB', 'PROCUREMENT - RB', 'PROCUREMENT - JUSPENG'];
+                        const crmData = [
+                            data.spk_date, data.leads_date, data.approval_jib_date, data.contract_date,
+                            data.procurement_juskeb_date, data.procurement_rb_date, data.procurement_juspeng_date,
+                        ];
+                        const tocData = timelineLabels.map(() => data.toc);
+
+                        const chartOptions = {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    type: 'time',
+                                    time: {
+                                        tooltipFormat: 'dd MMM yyyy'
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Date'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false
+                                }
+                            }
+                        };
+
+                        if (data.tanggal_kontrak && data.toc) {
+                            chartOptions.scales.y.min = data.tanggal_kontrak;
+                            chartOptions.scales.y.max = data.toc;
+                        }
+
+                        crmChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: timelineLabels,
+                                datasets: [{
+                                    label: 'STAGE CRM',
+                                    data: crmData,
+                                    borderColor: 'rgb(59, 130, 246)',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                                    stepped: true,
+                                }, {
+                                    label: 'TOC',
+                                    data: tocData,
+                                    borderColor: 'rgb(239, 68, 68)',
+                                    backgroundColor: 'rgba(239, 68, 68, 0.5)',
+                                }]
+                            },
+                            options: chartOptions
+                        });
+                    } catch (error) {
+                        console.error("Gagal membuat bagan linimasa:", error);
+                    }
+
                     modal.classList.remove('hidden');
                 });
         }
@@ -392,11 +513,8 @@
                 .then(response => response.json())
                 .then(data => {
                     form.action = `/project-plans/${planId}`;
-
-                    // Mengisi data hanya untuk field yang ada
                     document.getElementById('edit_plan_estimasi_nilai').value = parseFloat(data.estimasi_nilai);
                     document.getElementById('edit_plan_update_info').value = data.update_info;
-
                     modal.classList.remove('hidden');
                 });
         }

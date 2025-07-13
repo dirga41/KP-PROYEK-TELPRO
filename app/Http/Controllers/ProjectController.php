@@ -31,7 +31,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        // PERBAIKAN: Menambahkan validasi yang lebih spesifik untuk dropdown
+        // Menambahkan semua field baru ke validasi store
         $validatedData = $request->validate([
             'segment' => 'required|string|max:255',
             'area' => 'required|string|max:255',
@@ -42,7 +42,15 @@ class ProjectController extends Controller
             'toc' => 'nullable|date',
             'status_progres' => 'required|in:ongoing,closed,closed adm,not started',
             'jenis_pengadaan' => 'nullable|string|in:mitra,swakelola',
-            'status_panjar' => 'nullable|string|in:belum drop,mitra,sudah drop', // <-- Aturan ini memastikan hanya nilai dari dropdown yang diterima
+            'status_panjar' => 'nullable|string|in:belum drop,mitra,sudah drop',
+            // --- Validasi untuk tanggal timeline ---
+            'spk_date' => 'nullable|date',
+            'leads_date' => 'nullable|date',
+            'approval_jib_date' => 'nullable|date',
+            'contract_date' => 'nullable|date',
+            'procurement_juskeb_date' => 'nullable|date',
+            'procurement_rb_date' => 'nullable|date',
+            'procurement_juspeng_date' => 'nullable|date',
         ]);
 
         Project::create($validatedData);
@@ -72,12 +80,21 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        // PERBAIKAN: Menambahkan validasi yang lebih spesifik saat update
+        // --- PERBARUI VALIDASI DI FUNGSI UPDATE ---
         $validatedData = $request->validate([
             'nilai_kontrak' => 'required|numeric',
             'status_progres' => 'required|in:ongoing,closed,closed adm,not started',
             'jenis_pengadaan' => 'nullable|string|in:mitra,swakelola',
-            'status_panjar' => 'nullable|string|in:belum drop,mitra,sudah drop', // <-- Aturan ini juga diterapkan di sini
+            'status_panjar' => 'nullable|string|in:belum drop,mitra,sudah drop',
+            // --- Tambahkan validasi untuk semua field baru di sini ---
+            'toc' => 'nullable|date',
+            'spk_date' => 'nullable|date',
+            'leads_date' => 'nullable|date',
+            'approval_jib_date' => 'nullable|date',
+            'contract_date' => 'nullable|date',
+            'procurement_juskeb_date' => 'nullable|date',
+            'procurement_rb_date' => 'nullable|date',
+            'procurement_juspeng_date' => 'nullable|date',
         ]);
 
         $project->update($validatedData);

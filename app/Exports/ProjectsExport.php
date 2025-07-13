@@ -31,7 +31,7 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
      */
     public function headings(): array
     {
-        // Mendefinisikan judul kolom di file Excel
+        // [FIX] Mendefinisikan judul kolom baru di file Excel
         return [
             'ID',
             'Segment',
@@ -44,6 +44,14 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
             'Jenis Pengadaan',
             'Status Panjar',
             'Status Progres',
+            'Tahap CRM', // Kolom baru
+            'SPK Date',
+            'LEADS Date',
+            'APPROVAL JIB Date',
+            'CONTRACT Date',
+            'PROCUREMENT - JUSKEB Date',
+            'PROCUREMENT - RB Date',
+            'PROCUREMENT - JUSPENG Date',
             'Dibuat Pada',
         ];
     }
@@ -54,7 +62,7 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
      */
     public function map($project): array
     {
-        // Memformat setiap baris data
+        // [FIX] Memformat setiap baris data untuk menyertakan kolom baru
         return [
             $project->id,
             $project->segment,
@@ -67,6 +75,14 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
             $project->jenis_pengadaan,
             $project->status_panjar,
             $project->status_progres,
+            $project->current_crm_stage, // Data dari accessor
+            $project->spk_date ? $project->spk_date->format('d-m-Y') : '-',
+            $project->leads_date ? $project->leads_date->format('d-m-Y') : '-',
+            $project->approval_jib_date ? $project->approval_jib_date->format('d-m-Y') : '-',
+            $project->contract_date ? $project->contract_date->format('d-m-Y') : '-',
+            $project->procurement_juskeb_date ? $project->procurement_juskeb_date->format('d-m-Y') : '-',
+            $project->procurement_rb_date ? $project->procurement_rb_date->format('d-m-Y') : '-',
+            $project->procurement_juspeng_date ? $project->procurement_juspeng_date->format('d-m-Y') : '-',
             $project->created_at->format('d-m-Y H:i'),
         ];
     }

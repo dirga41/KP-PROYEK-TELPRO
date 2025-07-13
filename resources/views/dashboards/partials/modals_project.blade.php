@@ -103,9 +103,8 @@
     </div>
 </div>
 
-<!-- Modal Edit Project -->
 <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+    <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
         <div class="flex justify-between items-center border-b pb-3 mb-5">
             <h3 class="text-xl font-semibold text-gray-900">Edit Project</h3><button id="closeEditModal"
                 class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"><svg
@@ -118,7 +117,7 @@
         <form id="editForm" action="" method="POST">
             @csrf
             @method('PUT')
-            <div class="space-y-4">
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
                 <div><label for="edit_nilai_kontrak"
                         class="block mb-2 text-sm font-medium text-gray-900">Nilai</label><input type="number"
                         name="nilai_kontrak" id="edit_nilai_kontrak" placeholder="Rp"
@@ -152,6 +151,19 @@
                         <option value="sudah drop">Sudah Drop</option>
                     </select>
                 </div>
+
+                <div class="pt-4 mt-4 border-t">
+                    <h4 class="text-md font-semibold text-gray-800 mb-2">Timeline Dates</h4>
+                    <div><label for="edit_toc_date" class="block mb-2 text-sm font-medium text-gray-900">TOC Date</label><input type="date" name="toc" id="edit_toc_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></div>
+                    <div><label for="edit_spk_date" class="block mb-2 text-sm font-medium text-gray-900">SPK Date</label><input type="date" name="spk_date" id="edit_spk_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></div>
+                    <div><label for="edit_leads_date" class="block mb-2 text-sm font-medium text-gray-900">LEADS Date</label><input type="date" name="leads_date" id="edit_leads_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></div>
+                    <div><label for="edit_approval_jib_date" class="block mb-2 text-sm font-medium text-gray-900">APPROVAL JIB Date</label><input type="date" name="approval_jib_date" id="edit_approval_jib_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></div>
+                    <div><label for="edit_contract_date" class="block mb-2 text-sm font-medium text-gray-900">CONTRACT Date</label><input type="date" name="contract_date" id="edit_contract_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></div>
+                    <div><label for="edit_procurement_juskeb_date" class="block mb-2 text-sm font-medium text-gray-900">PROCUREMENT - JUSKEB Date</label><input type="date" name="procurement_juskeb_date" id="edit_procurement_juskeb_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></div>
+                    <div><label for="edit_procurement_rb_date" class="block mb-2 text-sm font-medium text-gray-900">PROCUREMENT - RB Date</label><input type="date" name="procurement_rb_date" id="edit_procurement_rb_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></div>
+                    <div><label for="edit_procurement_jusrpeng_date" class="block mb-2 text-sm font-medium text-gray-900">PROCUREMENT - JUSPENG Date</label><input type="date" name="procurement_juspeng_date" id="edit_procurement_juspeng_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"></div>
+                </div>
+
             </div>
             <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end">
                 <button id="cancelEditModal" type="button"
@@ -163,9 +175,8 @@
     </div>
 </div>
 
-<!-- Modal View Project -->
 <div id="viewModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+    <div class="relative top-10 mx-auto p-5 border w-full max-w-3xl shadow-lg rounded-md bg-white">
         <div class="flex justify-between items-center border-b pb-3 mb-5">
             <h3 class="text-xl font-semibold text-gray-900">Detail Proyek</h3><button id="closeViewModal"
                 class="text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"><svg
@@ -175,9 +186,18 @@
                         clip-rule="evenodd"></path>
                 </svg></button>
         </div>
-        <div id="viewModalContent" class="space-y-4"></div>
-        <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end"><button
-                id="cancelViewModal" type="button"
+        <div id="viewModalContent" class="space-y-4">
+        </div>
+
+        <div class="mt-6 pt-4 border-t">
+            <h4 class="text-md font-semibold text-gray-800 mb-2">Timeline CRM</h4>
+            <div style="height: 300px;">
+                <canvas id="crmTimelineChart"></canvas>
+            </div>
+        </div>
+
+        <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b justify-end">
+            <button id="cancelViewModal" type="button"
                 class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-white focus:z-10">Close</button>
         </div>
     </div>
