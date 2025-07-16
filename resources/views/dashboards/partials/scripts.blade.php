@@ -16,6 +16,7 @@
             initProjectPlanFeatures();
             initRkapFeatures();
             initOverviewCharts();
+            initDaysCountdown();
         }
 
         /**
@@ -70,6 +71,50 @@
             setupTableSearch('planTableSearch', '#planTableBody .plan-row');
             setupTableSearch('rkapTableSearch', '#rkapTableBody .rkap-row');
         }
+
+        /**
+         * [MODIFIED] Menginisialisasi countdown sisa hari dengan label berwarna.
+         */
+        function initDaysCountdown() {
+            const countdownElements = document.querySelectorAll('.countdown-days');
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            countdownElements.forEach(el => {
+                const tocDateString = el.dataset.toc;
+
+                if (tocDateString && tocDateString.trim() !== '') {
+                    const tocDate = new Date(tocDateString);
+                    tocDate.setHours(0, 0, 0, 0);
+
+                    const timeDiff = tocDate.getTime() - now.getTime();
+
+                    if (timeDiff < 0) {
+                        // Label untuk proyek yang sudah selesai
+                        el.innerHTML = '<span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">Selesai</span>';
+                    } else {
+                        const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                        let labelClass = '';
+
+                        // Menentukan warna label berdasarkan sisa hari
+                        if (daysLeft <= 10) {
+                            labelClass = 'bg-red-200 text-red-800'; // Merah
+                        } else if (daysLeft <= 20) {
+                            labelClass = 'bg-yellow-200 text-yellow-800'; // Kuning
+                        } else {
+                            labelClass = 'bg-green-200 text-green-800'; // Hijau
+                        }
+
+                        // Menampilkan label dengan warna yang sesuai
+                        el.innerHTML = `<span class="${labelClass} py-1 px-3 rounded-full text-xs">${daysLeft} hari</span>`;
+                    }
+                } else {
+                    // Label untuk data yang tidak memiliki tanggal TOC
+                    el.innerHTML = '<span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">-</span>';
+                }
+            });
+        }
+
 
         /**
          * Fungsi generik untuk pencarian.
@@ -426,6 +471,7 @@
                             <p><strong class="font-semibold text-gray-600">Tanggal TOC:</strong><br>${tglToc}</p>
                             <p><strong class="font-semibold text-gray-600">Status:</strong><br>${data.status_progres || '-'}</p>
                             <p><strong class="font-semibold text-gray-600">Jenis Pengadaan:</strong><br>${data.jenis_pengadaan || '-'}</p>
+                            <p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>
                         </div>`;
 
                     try {

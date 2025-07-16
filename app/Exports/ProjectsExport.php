@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Project;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -31,7 +32,7 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
      */
     public function headings(): array
     {
-        // [FIX] Mendefinisikan judul kolom baru di file Excel
+        // Mendefinisikan judul kolom di file Excel, termasuk "Sisa Hari"
         return [
             'ID',
             'Segment',
@@ -40,11 +41,12 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
             'Tanggal Kontrak',
             'Nilai Kontrak',
             'Tanggal TOC',
+            'Sisa Hari', // Kolom baru
             'Area',
             'Jenis Pengadaan',
             'Status Panjar',
             'Status Progres',
-            'Tahap CRM', // Kolom baru
+            'Tahap CRM',
             'SPK Date',
             'LEADS Date',
             'APPROVAL JIB Date',
@@ -62,7 +64,20 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
      */
     public function map($project): array
     {
-        // [FIX] Memformat setiap baris data untuk menyertakan kolom baru
+        // Logika untuk menghitung sisa hari
+        $daysLeft = '-';
+        if ($project->toc) {
+            $tocDate = Carbon::parse($project->toc);
+            $now = Carbon::now();
+            if ($tocDate->isPast()) {
+                $daysLeft = 'Selesai';
+            } else {
+                // Menggunakan diffInDays untuk mendapatkan selisih hari
+                $daysLeft = $now->diffInDays($tocDate) . ' hari';
+            }
+        }
+
+        // Memformat setiap baris data untuk menyertakan kolom baru
         return [
             $project->id,
             $project->segment,
@@ -71,6 +86,7 @@ class ProjectsExport implements FromQuery, WithHeadings, WithMapping, ShouldAuto
             $project->tanggal_kontrak->format('d-m-Y'),
             $project->nilai_kontrak,
             $project->toc ? $project->toc->format('d-m-Y') : '-',
+            $daysLeft, // Menambahkan data sisa hari
             $project->area,
             $project->jenis_pengadaan,
             $project->status_panjar,

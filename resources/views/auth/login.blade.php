@@ -38,7 +38,7 @@
                 <!-- Username -->
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-semibold mb-1">Username</label>
-                    <input type="text" name="username" placeholder="Enter your email"
+                    <input type="text" name="username" placeholder="Enter your username"
                         class="w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
                         required>
                 </div>
@@ -46,7 +46,7 @@
                 <!-- Password -->
                 <div class="mb-6">
                     <label class="block text-gray-700 text-sm font-semibold mb-1">Password</label>
-                    <input type="password" name="password" placeholder="Name"
+                    <input type="password" name="password" placeholder="Password"
                         class="w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
                         required>
                 </div>

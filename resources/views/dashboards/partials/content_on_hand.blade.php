@@ -19,55 +19,57 @@
         <table class="min-w-full leading-normal">
             <thead>
                 <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                    <th class="py-3 px-6 text-left"><input type="checkbox" id="selectAllCheckbox">
-                    </th>
-                    <th class="py-3 px-6 text-center">Segment</th>
-                    <th class="py-3 px-6 text-center">Project</th>
-                    <th class="py-3 px-6 text-center">No Kontrak</th>
-                    <th class="py-3 px-6 text-center">Tgl Kontrak</th>
-                    <th class="py-3 px-6 text-center">Nilai</th>
-                    <th class="py-3 px-6 text-center">TOC</th>
-                    <th class="py-3 px-6 text-center">Area</th>
-                    <th class="py-3 px-6 text-center">Status Progress</th>
-                    <!-- [FIX] Menambahkan kolom baru untuk Tahap CRM -->
-                    <th class="py-3 px-6 text-center">Tahap CRM</th>
-                    <th class="py-3 px-6 text-center">Actions</th>
+                    <th class="py-2 px-3 text-left"><input type="checkbox" id="selectAllCheckbox"></th>
+                    <th class="py-2 px-3 text-center">Segment</th>
+                    <th class="py-2 px-3 text-center">Project</th>
+                    <th class="py-2 px-3 text-center">No. Kontrak</th>
+                    <th class="py-2 px-3 text-center">Tgl. Kontrak</th>
+                    <th class="py-2 px-3 text-center">Nilai</th>
+                    <th class="py-2 px-3 text-center">TOC</th>
+                    <th class="py-2 px-3 text-center">Sisa Hari</th>
+                    <th class="py-2 px-3 text-center">Area</th>
+                    <th class="py-2 px-3 text-center">Status</th>
+                    <th class="py-2 px-3 text-center">CRM</th>
+                    <th class="py-2 px-3 text-center">Actions</th>
                 </tr>
             </thead>
-            <tbody id="projectTableBody" class="text-gray-700 text-sm">
+            <tbody id="projectTableBody" class="text-gray-700 text-xs">
                 @forelse ($projects as $project)
                 <tr class="project-row border-b border-gray-200 hover:bg-gray-50">
-                    <td class="py-3 px-6 text-left"><input type="checkbox" class="row-checkbox" data-id="{{ $project->id }}">
+                    <td class="py-2 px-3 text-left"><input type="checkbox" class="row-checkbox" data-id="{{ $project->id }}">
                     </td>
-                    <td class="py-3 px-6 text-left">{{ $project->segment }}</td>
-                    <td class="py-3 px-6 text-left font-medium">{{ $project->project }}</td>
-                    <td class="py-3 px-6 text-left">{{ $project->no_kontrak }}</td>
-                    <td class="py-3 px-6 text-left">
+                    <td class="py-2 px-3 text-align">{{ $project->segment }}</td>
+                    <td class="py-2 px-3 text-left font-medium">{{ $project->project }}</td>
+                    <td class="py-2 px-3 text-left">{{ $project->no_kontrak }}</td>
+                    <td class="py-2 px-3 text-center whitespace-nowrap">
                         {{ \Carbon\Carbon::parse($project->tanggal_kontrak)->format('d M Y') }}
                     </td>
-                    <td class="py-3 px-6 text-left">Rp
+                    <td class="py-2 px-3 text-left whitespace-nowrap">Rp
                         {{ number_format($project->nilai_kontrak, 0, ',', '.') }}
                     </td>
-                    <td class="py-3 px-6 text-left">
+                    <td class="py-2 px-3 text-left whitespace-nowrap">
                         {{ $project->toc ? \Carbon\Carbon::parse($project->toc)->format('d M Y') : '-' }}
                     </td>
-                    <td class="py-3 px-6 text-left">{{ $project->area }}</td>
-                    <td class="py-3 px-6 text-center">
+                    <td class="py-2 px-3 text-center">
+                        {{-- Elemen ini akan diisi secara dinamis oleh JavaScript --}}
+                        <span class="countdown-days" data-toc="{{ $project->toc ? $project->toc->toDateString() : '' }}">-</span>
+                    </td>
+                    <td class="py-2 px-3 text-left">{{ $project->area }}</td>
+                    <td class="py-2 px-3 text-center">
                         @if ($project->status_progres == 'ongoing')
-                        <span class="bg-blue-200 text-blue-800 py-1 px-3 rounded-full text-xs">On Going</span>
+                        <span class="bg-blue-200 text-blue-800 py-1 px-3 rounded-full">On Going</span>
                         @elseif($project->status_progres == 'closed')
-                        <span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs">Closed</span>
+                        <span class="bg-green-200 text-green-800 py-1 px-3 rounded-full">Closed</span>
                         @elseif($project->status_progres == 'closed adm')
-                        <span class="bg-yellow-200 text-yellow-800 py-1 px-3 rounded-full text-xs">Closed Adm</span>
+                        <span class="bg-yellow-200 text-yellow-800 py-1 px-3 rounded-full">Closed Adm</span>
                         @else
-                        <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">Not Started</span>
+                        <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full">Not Started</span>
                         @endif
                     </td>
-                    <!-- [FIX] Menampilkan data dari accessor yang sudah dibuat -->
-                    <td class="py-3 px-6 text-center font-medium">
-                        <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full text-xs">{{ $project->current_crm_stage }}</span>
+                    <td class="py-2 px-3 text-center font-medium">
+                        <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full">{{ $project->current_crm_stage }}</span>
                     </td>
-                    <td class="py-3 px-6 text-center">
+                    <td class="py-2 px-3 text-center">
                         <div class="flex item-center justify-center">
                             <button data-id="{{ $project->id }}"
                                 class="view-btn w-8 h-8 rounded-full flex items-center justify-center bg-blue-400 hover:bg-blue-500 text-white mr-2"
@@ -103,7 +105,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="12" class="text-center py-6">Belum ada data proyek.</td>
+                    <td colspan="13" class="text-center py-6">Belum ada data proyek.</td>
                 </tr>
                 @endforelse
             </tbody>
