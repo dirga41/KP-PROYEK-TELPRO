@@ -54,15 +54,11 @@ class ContractController extends Controller
         }
 
         // 3. Data untuk Top 10 Kontrak yang Akan Berakhir (dalam 90 hari ke depan)
-        $expiringContracts = Contract::where('status', '!=', 'berakhir')
-            ->where('end_date', '<=', now()->addDays(90))
-            ->orderBy('end_date', 'asc')
-            ->take(10)
-            ->get();
+        // Logika ini bisa disederhanakan karena status sudah dinamis
+        $expiringContracts = Contract::all()->filter(function ($contract) {
+            return $contract->status === 'akan berakhir';
+        })->sortBy('end_date')->take(10);
         
-        // --- PERUBAHAN KUNCI ---
-        // Mengembalikan path view ke notasi titik, sesuai petunjuk error Laravel.
-        // Ini berarti Laravel mencari file 'marketing.blade.php' di dalam folder 'resources/views/dashboards/'.
         return view('dashboards.marketing', compact(
             'contracts', 
             'segmentData', 
@@ -73,6 +69,7 @@ class ContractController extends Controller
 
     public function store(Request $request)
     {
+        // Validasi 'status' dihapus dari sini
         $validatedData = $request->validate([
             'tenant_name' => 'required|string|max:255',
             'tenant_group' => 'nullable|string|max:255',
@@ -82,7 +79,6 @@ class ContractController extends Controller
             'tahun_kontrak' => 'required|digits:4',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'required|in:aktif,akan berakhir,berakhir',
             'nilai_kontrak' => 'required|numeric|min:0',
         ]);
 
@@ -98,6 +94,7 @@ class ContractController extends Controller
 
     public function update(Request $request, Contract $contract)
     {
+        // Validasi 'status' dihapus dari sini
         $validatedData = $request->validate([
             'tenant_name' => 'required|string|max:255',
             'tenant_group' => 'nullable|string|max:255',
@@ -107,7 +104,6 @@ class ContractController extends Controller
             'tahun_kontrak' => 'required|digits:4',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'status' => 'required|in:aktif,akan berakhir,berakhir',
             'nilai_kontrak' => 'required|numeric|min:0',
         ]);
 

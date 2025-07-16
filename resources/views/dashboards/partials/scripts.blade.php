@@ -104,7 +104,7 @@
                         } else {
                             labelClass = 'bg-green-200 text-green-800'; // Hijau
                         }
-
+                        
                         // Menampilkan label dengan warna yang sesuai
                         el.innerHTML = `<span class="${labelClass} py-1 px-3 rounded-full text-xs">${daysLeft} hari</span>`;
                     }
@@ -474,6 +474,7 @@
                             <p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>
                         </div>`;
 
+                    // [MODIFIED] Konfigurasi chart diubah agar sesuai dengan gambar
                     try {
                         const ctx = document.getElementById('crmTimelineChart').getContext('2d');
                         if (crmChart) {
@@ -491,6 +492,11 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             scales: {
+                                x: {
+                                    grid: {
+                                        display: false // Menghilangkan grid vertikal
+                                    }
+                                },
                                 y: {
                                     type: 'time',
                                     time: {
@@ -507,8 +513,23 @@
                                     position: 'top'
                                 },
                                 tooltip: {
-                                    mode: 'index',
-                                    intersect: false
+                                    mode: 'nearest', // Diubah dari 'index' ke 'nearest'
+                                    intersect: true,   // Diubah ke true agar tooltip hanya muncul saat kursor tepat di atas titik
+                                    displayColors: true,
+                                    callbacks: {
+                                        // Format tooltip agar lebih sesuai dengan contoh
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                const date = new Date(context.parsed.y);
+                                                label += date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                                            }
+                                            return label;
+                                        }
+                                    }
                                 }
                             }
                         };
@@ -526,13 +547,28 @@
                                     label: 'STAGE CRM',
                                     data: crmData,
                                     borderColor: 'rgb(59, 130, 246)',
-                                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                                    stepped: true,
+                                    backgroundColor: 'rgb(59, 130, 246)',
+                                    fill: false,
+                                    tension: 0.2, 
+                                    pointRadius: 4, // Menampilkan titik secara default
+                                    pointHoverRadius: 7, // Memperbesar titik saat hover
+                                    pointHitRadius: 10,
+                                    pointBorderWidth: 2,
+                                    pointHoverBackgroundColor: '#fff',
+                                    pointHoverBorderColor: 'rgb(59, 130, 246)',
                                 }, {
                                     label: 'TOC',
                                     data: tocData,
                                     borderColor: 'rgb(239, 68, 68)',
-                                    backgroundColor: 'rgba(239, 68, 68, 0.5)',
+                                    backgroundColor: 'rgb(239, 68, 68)',
+                                    fill: false,
+                                    tension: 0.2,
+                                    pointRadius: 4, // Menampilkan titik secara default
+                                    pointHoverRadius: 7, // Memperbesar titik saat hover
+                                    pointHitRadius: 10,
+                                    pointBorderWidth: 2,
+                                    pointHoverBackgroundColor: '#fff',
+                                    pointHoverBorderColor: 'rgb(239, 68, 68)',
                                 }]
                             },
                             options: chartOptions
