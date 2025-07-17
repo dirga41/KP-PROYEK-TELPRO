@@ -140,7 +140,24 @@
          * Inisialisasi fitur "Project On Hand".
          */
         function initProjectFeatures() {
-            setupModal('inputModal', '#openInputModal', 'closeInputModal', 'cancelInputModal');
+            setupModal('inputModal', '#openInputModal', 'closeInputModal', 'cancelInputModal', () => {
+                const jenisPengadaanInput = document.getElementById('jenis_pengadaan');
+                const statusPanjarInput = document.getElementById('status_panjar');
+
+                const toggleStatusPanjar = () => {
+                    if (jenisPengadaanInput.value === 'mitra') {
+                        statusPanjarInput.disabled = true;
+                        statusPanjarInput.value = '';
+                    } else {
+                        statusPanjarInput.disabled = false;
+                    }
+                };
+
+                jenisPengadaanInput.removeEventListener('change', toggleStatusPanjar);
+                jenisPengadaanInput.addEventListener('change', toggleStatusPanjar);
+                
+                toggleStatusPanjar(); 
+            });
             setupModal('editModal', '.edit-btn', 'closeEditModal', 'cancelEditModal', handleProjectEdit);
             setupModal('viewModal', '.view-btn', 'closeViewModal', 'cancelViewModal', handleProjectView);
             setupModal('deleteModal', '.delete-btn', null, 'cancelDeleteModal', handleProjectDelete);
@@ -339,11 +356,10 @@
             const closeBtn = closeBtnId ? document.getElementById(closeBtnId) : null;
             const cancelBtn = cancelBtnId ? document.getElementById(cancelBtnId) : null;
             const openModal = (event) => {
+                modal.classList.remove('hidden');
                 if (onOpen) {
                     event.preventDefault();
                     onOpen(event.currentTarget.dataset.id);
-                } else {
-                    modal.classList.remove('hidden');
                 }
             };
             const closeModal = () => modal.classList.add('hidden');
@@ -389,10 +405,27 @@
         function handleProjectEdit(projectId) {
             const modal = document.getElementById('editModal');
             const form = document.getElementById('editForm');
+            const jenisPengadaanInput = document.getElementById('edit_jenis_pengadaan');
+            const statusPanjarInput = document.getElementById('edit_status_panjar');
+            
             const formatDateForInput = (dateString) => {
                 if (!dateString) return '';
                 return new Date(dateString).toISOString().slice(0, 10);
             };
+            
+            // [MODIFIED] Logic to disable/enable 'Status Panjar'
+            const toggleStatusPanjarState = () => {
+                if (jenisPengadaanInput.value === 'mitra') {
+                    statusPanjarInput.disabled = true;
+                    statusPanjarInput.value = ''; // Clear value when disabled
+                } else {
+                    statusPanjarInput.disabled = false;
+                }
+            };
+            
+            jenisPengadaanInput.removeEventListener('change', toggleStatusPanjarState); // Remove old listener to prevent duplicates
+            jenisPengadaanInput.addEventListener('change', toggleStatusPanjarState);
+
 
             fetch(`/projects/${projectId}`)
                 .then(response => response.json())
@@ -400,8 +433,13 @@
                     form.action = `/projects/${projectId}`;
                     document.getElementById('edit_nilai_kontrak').value = parseFloat(data.nilai_kontrak);
                     document.getElementById('edit_status_progres').value = data.status_progres;
-                    document.getElementById('edit_jenis_pengadaan').value = data.jenis_pengadaan || '';
-                    document.getElementById('edit_status_panjar').value = data.status_panjar || '';
+                    
+                    // Set values for 'Jenis Pengadaan' and 'Status Panjar'
+                    jenisPengadaanInput.value = data.jenis_pengadaan || '';
+                    statusPanjarInput.value = data.status_panjar || '';
+                    
+                    // [MODIFIED] Set initial state for 'Status Panjar'
+                    toggleStatusPanjarState();
 
                     // [FIX] Mengatur batas min dan max untuk semua input tanggal linimasa
                     const minDate = formatDateForInput(data.tanggal_kontrak);
@@ -460,6 +498,11 @@
                     }) : '-';
                     const nilaiKontrak = new Intl.NumberFormat('id-ID').format(data.nilai_kontrak);
 
+                    // [MODIFIED] Conditionally show 'Status Panjar'
+                    const statusPanjarHtml = data.jenis_pengadaan !== 'mitra' 
+                        ? `<p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>`
+                        : '';
+
                     content.innerHTML = `
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <p><strong class="font-semibold text-gray-600">Project:</strong><br>${data.project || '-'}</p>
@@ -471,7 +514,7 @@
                             <p><strong class="font-semibold text-gray-600">Tanggal TOC:</strong><br>${tglToc}</p>
                             <p><strong class="font-semibold text-gray-600">Status:</strong><br>${data.status_progres || '-'}</p>
                             <p><strong class="font-semibold text-gray-600">Jenis Pengadaan:</strong><br>${data.jenis_pengadaan || '-'}</p>
-                            <p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>
+                            ${statusPanjarHtml}
                         </div>`;
 
                     // [MODIFIED] Konfigurasi chart diubah agar sesuai dengan gambar

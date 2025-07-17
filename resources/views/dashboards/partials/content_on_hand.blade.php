@@ -67,7 +67,11 @@
                         @endif
                     </td>
                     <td class="py-2 px-3 text-center font-medium">
-                        <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full">{{ $project->current_crm_stage }}</span>
+                        @if($project->current_crm_stage)
+                            <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full">{{ $project->current_crm_stage }}</span>
+                        @else
+                            <span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Belum ada input</span>
+                        @endif
                     </td>
                     <td class="py-2 px-3 text-center">
                         <div class="flex item-center justify-center">

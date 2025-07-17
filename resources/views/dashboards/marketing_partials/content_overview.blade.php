@@ -49,15 +49,15 @@
             <div class="flex flex-col">
                 <div class="flex bg-orange-500 text-white font-bold p-2 rounded-t-lg">
                     <div class="w-1/12 text-center">No</div>
-                    <div class="w-7/12 pl-2">Tenant</div>
-                    <div class="w-4/12 text-right pr-4">Nilai Kontrak</div>
+                    <div class="w-7/12 pl-2 text-center">Tenant</div>
+                    <div class="w-4/12 text-center pr-4">Nilai Kontrak</div>
                 </div>
                 <div class="max-h-48 overflow-y-auto">
                     @forelse ($topRevenueTenants ?? [] as $index => $tenant)
                         <div class="flex items-center p-2 border-b border-gray-200 hover:bg-gray-50">
-                            <div class="w-1/12 text-center text-gray-600">{{ $index + 1 }}.</div>
-                            <div class="w-7/12 pl-2 font-medium text-gray-800">{{ $tenant->name }}</div>
-                            <div class="w-4/12 text-right pr-4 text-gray-700">Rp. {{ number_format($tenant->value, 0, ',', '.') }}</div>
+                            <div class="w-1/12 text-center text-gray-600">{{ $loop->iteration }}.</div>
+                            <div class="w-7/12 text-center pl-2 font-medium text-gray-800">{{ $tenant->name }}</div>
+                            <div class="w-4/12 text-center pr-4 text-gray-700">Rp. {{ number_format($tenant->value, 0, ',', '.') }}</div>
                         </div>
                     @empty
                         <div class="text-center py-4 text-gray-500">Data tenant tidak tersedia.</div>
@@ -81,7 +81,7 @@
                 <div class="max-h-48 overflow-y-auto">
                      @forelse ($expiringContracts ?? [] as $index => $contract)
                         <div class="flex items-center p-2 border-b border-gray-200 hover:bg-gray-50">
-                            <div class="w-1/12 text-center text-gray-600">{{ $index + 1 }}.</div>
+                            <div class="w-1/12 text-center text-gray-600">{{ $loop->iteration }}.</div>
                             <div class="w-7/12 pl-2 font-medium text-gray-800">{{ $contract->tenant_name }}</div>
                             <div class="w-4/12 text-center text-gray-700">{{ $contract->end_date->format('d-m-Y') }}</div>
                         </div>

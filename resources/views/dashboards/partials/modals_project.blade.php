@@ -29,14 +29,14 @@
                     <select name="area" id="area"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         required>
-                        <option value="Semarang jateng utara">Semarang jateng utara</option>
-                        <option value="Yogya jateng selatan">Yogya jateng selatan</option>
-                        <option value="Solo jateng timur">Solo jateng timur</option>
+                        <option value="Semarang jateng utara">Semarang Jateng Utara</option>
+                        <option value="Yogya jateng selatan">Yogya Jateng Selatan</option>
+                        <option value="Solo jateng timur">Solo Jateng Timur</option>
                         <option value="Jatim Barat">Jatim Barat</option>
                         <option value="Suramadu">Suramadu</option>
-                        <option value="Jatim timur">Jatim timur</option>
+                        <option value="Jatim timur">Jatim Timur</option>
                         <option value="Bali">Bali</option>
-                        <option value="Nusra">Nusra</option>
+                        <option value="Nusra">Nusa Tenggara</option>
                     </select>
                 </div>
                 <div><label for="project"

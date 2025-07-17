@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contract;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Exports\ContractsExport;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -43,7 +45,7 @@ class ContractController extends Controller
         });
 
         // 2. Data untuk Top 10 Revenue Tenant
-        $topRevenueTenants = collect(); 
+        $topRevenueTenants = collect();
         if (Schema::hasColumn('contracts', 'nilai_kontrak')) {
             $topRevenueTenants = Contract::select('tenant_name as name', DB::raw('SUM(nilai_kontrak) as value'))
                 ->where('nilai_kontrak', '>', 0)
@@ -53,23 +55,48 @@ class ContractController extends Controller
                 ->get();
         }
 
-        // 3. Data untuk Top 10 Kontrak yang Akan Berakhir (dalam 90 hari ke depan)
-        // Logika ini bisa disederhanakan karena status sudah dinamis
+        // 3. Data untuk Top 10 Kontrak yang Akan Berakhir
         $expiringContracts = Contract::all()->filter(function ($contract) {
             return $contract->status === 'akan berakhir';
         })->sortBy('end_date')->take(10);
-        
+
         return view('dashboards.marketing', compact(
-            'contracts', 
-            'segmentData', 
-            'topRevenueTenants', 
+            'contracts',
+            'segmentData',
+            'topRevenueTenants',
             'expiringContracts'
         ));
     }
 
+    /**
+     * Menampilkan halaman monitoring asset.
+     */
+    public function asset()
+    {
+        $user = Auth::user();
+
+        // Data dummy untuk kartu ringkasan
+        $summaryData = [
+            'luas_tanah' => '972',
+            'jumlah_gedung' => '194',
+            'asset_npa' => '54',
+        ];
+
+        // --- PERUBAHAN UTAMA ---
+        // Mengambil semua data kontrak individual, diurutkan dari yang terbaru.
+        // Variabelnya kita ubah namanya menjadi 'contracts' agar lebih jelas.
+        $contractsData = Contract::latest()->get();
+
+        return view('dashboards.marketing_asset', [
+            'user' => $user,
+            'summary' => $summaryData,
+            'contracts' => $contractsData, // Mengirim data kontrak ke view
+        ]);
+    }
+
+
     public function store(Request $request)
     {
-        // Validasi 'status' dihapus dari sini
         $validatedData = $request->validate([
             'tenant_name' => 'required|string|max:255',
             'tenant_group' => 'nullable|string|max:255',
@@ -94,7 +121,6 @@ class ContractController extends Controller
 
     public function update(Request $request, Contract $contract)
     {
-        // Validasi 'status' dihapus dari sini
         $validatedData = $request->validate([
             'tenant_name' => 'required|string|max:255',
             'tenant_group' => 'nullable|string|max:255',
@@ -115,7 +141,7 @@ class ContractController extends Controller
     public function destroy(Contract $contract)
     {
         $contract->delete();
-        
+
         return redirect(route('dashboard.marketing') . '#contract')->with('success_contract', 'Data kontrak berhasil dihapus.');
     }
 
@@ -126,7 +152,7 @@ class ContractController extends Controller
         ]);
 
         $ids = explode(',', $request->query('ids'));
-        
+
         $sanitizedIds = array_filter(array_map('intval', $ids), fn($id) => $id > 0);
 
         if (empty($sanitizedIds)) {

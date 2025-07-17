@@ -1,10 +1,11 @@
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        
+    document.addEventListener('DOMContentLoaded', function() {
+
         /**
          * Fungsi inisialisasi utama untuk dasbor marketing.
          */
         function init() {
+            initSidebarSearch()
             initTabs();
             initContractFeatures();
         }
@@ -13,6 +14,26 @@
          * Mengatur sistem navigasi tab.
          * Logika ini membaca URL hash saat halaman dimuat untuk memilih tab yang benar.
          */
+
+        function initSidebarSearch() {
+            const searchInput = document.getElementById('sidebarSearchInput');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                const navItems = document.querySelectorAll('#mainNav .nav-item');
+
+                navItems.forEach(item => {
+                    const menuText = item.textContent.toLowerCase();
+                    if (menuText.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
         function initTabs() {
             const tabs = document.querySelectorAll('#tabs .tab-link');
             const tabContents = document.querySelectorAll('.tab-content');
@@ -44,7 +65,7 @@
 
             // Tambahkan event listener untuk setiap klik pada tab.
             tabs.forEach(tab => {
-                tab.addEventListener('click', function (e) {
+                tab.addEventListener('click', function(e) {
                     e.preventDefault();
                     const tabId = this.dataset.tab;
                     // Perbarui hash di URL tanpa me-reload halaman.
@@ -73,8 +94,8 @@
             setupSelectAll('selectAllContractsCheckbox', '.contract-row-checkbox');
             setupModals();
             setupExport(
-                'exportSelectedBtn', 
-                '.contract-row-checkbox', 
+                'exportSelectedBtn',
+                '.contract-row-checkbox',
                 "{{ route('contracts.export') }}",
                 'kontrak'
             );
@@ -133,18 +154,18 @@
                     document.querySelectorAll(rowCheckboxSelector).forEach(checkbox => {
                         checkbox.checked = isChecked;
                     });
-                    if(exportBtn) exportBtn.disabled = !isChecked;
+                    if (exportBtn) exportBtn.disabled = !isChecked;
                 });
             }
         }
-        
+
         function setupExport(buttonId, checkboxSelector, exportUrl, itemType) {
             const exportBtn = document.getElementById(buttonId);
             const checkboxes = document.querySelectorAll(checkboxSelector);
 
             const toggleExportButton = () => {
                 const anyChecked = document.querySelectorAll(`${checkboxSelector}:checked`).length > 0;
-                if(exportBtn) exportBtn.disabled = !anyChecked;
+                if (exportBtn) exportBtn.disabled = !anyChecked;
             };
 
             checkboxes.forEach(checkbox => checkbox.addEventListener('change', toggleExportButton));
@@ -160,7 +181,7 @@
                         const url = new URL(exportUrl);
                         url.searchParams.append('ids', selectedIds.join(','));
                         window.location.href = url.toString();
-                    } catch(e) {
+                    } catch (e) {
                         alert("Terjadi kesalahan pada fitur export.");
                     }
                 });
