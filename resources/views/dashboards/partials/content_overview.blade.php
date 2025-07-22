@@ -27,9 +27,9 @@
         <div class="bg-white p-6 rounded-xl shadow-md flex flex-col justify-center">
             <div class="grid grid-cols-3 gap-x-4">
                 {{-- Headers --}}
-                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Kategori</div>
-                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Jumlah Project</div>
-                <div class="p-2 text-center text-white font-bold bg-orange-500 rounded-lg">Nilai</div>
+                <div class="p-2 text-center text-white font-bold bg-gradient-to-r from-[#FD8E01] to-[#B23902] rounded-lg">Kategori</div>
+                <div class="p-2 text-center text-white font-bold bg-gradient-to-r from-[#FD8E01] to-[#B23902] rounded-lg">Jumlah Project</div>
+                <div class="p-2 text-center text-white font-bold bg-gradient-to-r from-[#FD8E01] to-[#B23902] rounded-lg">Nilai</div>
 
                 {{-- Row On Hand --}}
                 <div class="py-3 px-2 font-medium text-gray-700">On Hand</div>

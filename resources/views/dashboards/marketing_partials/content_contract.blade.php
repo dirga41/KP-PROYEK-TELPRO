@@ -16,6 +16,8 @@
 
         <!-- Tombol Aksi Kanan dan Pencarian -->
         <div class="flex items-center">
+            <button id="openContractInputModal"
+                class="mr-4 bg-gradient-to-r from-[#FD8E01] to-[#B23902] hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">Input</button>
             <div class="relative">
                 <input id="contractTableSearch" type="text" placeholder="Search..."
                     class="border rounded-lg py-2 px-8 focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -26,8 +28,6 @@
                     </svg>
                 </span>
             </div>
-            <button id="openContractInputModal"
-                class="ml-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">Input</button>
         </div>
     </div>
 

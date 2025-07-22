@@ -47,7 +47,7 @@
     <div class="mt-auto">
          <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+            <button type="submit" class="w-full bg-gradient-to-r from-[#FD8E01] to-[#B23902] hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
                 Logout
             </button>
         </form>

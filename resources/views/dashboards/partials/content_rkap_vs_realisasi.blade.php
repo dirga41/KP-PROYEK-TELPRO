@@ -1,12 +1,12 @@
 <div id="rkap-content" data-tab-content="rkap" class="tab-content hidden">
     <div class="flex justify-end items-center mb-4">
+        <button id="openRkapInputModal" class="mr   -4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Input</button>
         <div class="relative">
             <input id="rkapTableSearch" type="text" placeholder="Search" class="border rounded-lg py-2 px-8">
             <span class="absolute left-2 top-2.5 text-gray-400">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </span>
         </div>
-        <button id="openRkapInputModal" class="ml-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Input</button>
     </div>
     
     @if (session('success_rkap'))

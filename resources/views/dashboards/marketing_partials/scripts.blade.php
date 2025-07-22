@@ -2,27 +2,78 @@
     document.addEventListener('DOMContentLoaded', function() {
 
         /**
-         * Fungsi inisialisasi utama untuk dasbor marketing.
+         * ===================================================================
+         * FUNGSI INISIALISASI UTAMA
+         * ===================================================================
          */
         function init() {
-            initSidebarSearch()
-            initTabs();
+            initSidebarSearch();
+            initTabs(); // <-- Fungsi ini akan kita ganti
             initContractFeatures();
+            initDynamicDonutChart();
         }
 
+
         /**
-         * Mengatur sistem navigasi tab.
-         * Logika ini membaca URL hash saat halaman dimuat untuk memilih tab yang benar.
+         * ===================================================================
+         * FUNGSI-FUNGSI APLIKASI
+         * ===================================================================
          */
 
+        function initDynamicDonutChart() {
+            // ... (kode donut chart Anda yang sudah ada, tidak perlu diubah)
+            const container = document.getElementById('donutChartContainer');
+            if (!container) return;
+            const svg = document.getElementById('donutChartSvg');
+            const legend = document.getElementById('donutChartLegend');
+            const dataString = container.dataset.segments;
+            if (!dataString || !svg || !legend) return;
+            try {
+                const segments = JSON.parse(dataString);
+                if (segments.length === 0) return;
+                let offset = 0;
+                svg.querySelectorAll('path.segment').forEach(path => path.remove());
+                legend.innerHTML = '';
+                segments.forEach(segment => {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('class', `segment ${segment.color}`);
+                    path.setAttribute('stroke', 'currentColor');
+                    path.setAttribute('stroke-width', '4');
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke-dasharray', `${segment.percentage}, 100`);
+                    path.setAttribute('stroke-dashoffset', `-${offset}`);
+                    path.setAttribute('d', 'M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831');
+                    svg.appendChild(path);
+                    offset += segment.percentage;
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center mb-2';
+                    const colorDot = document.createElement('span');
+                    const bgColorClass = segment.color.replace('text-', 'bg-');
+                    colorDot.className = `w-3 h-3 rounded-full ${bgColorClass} mr-2`;
+                    const text = document.createElement('span');
+                    text.textContent = `${segment.name} (${segment.percentage}%)`;
+                    li.appendChild(colorDot);
+                    li.appendChild(text);
+                    legend.appendChild(li);
+                });
+                function resizeChart() {
+                    const width = container.offsetWidth;
+                    container.style.height = `${width}px`;
+                }
+                resizeChart();
+                window.addEventListener('resize', resizeChart);
+            } catch (e) {
+                console.error("Gagal mem-parsing data chart:", e);
+            }
+        }
+
         function initSidebarSearch() {
+            // ... (kode pencarian sidebar Anda, tidak perlu diubah)
             const searchInput = document.getElementById('sidebarSearchInput');
             if (!searchInput) return;
-
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase().trim();
                 const navItems = document.querySelectorAll('#mainNav .nav-item');
-
                 navItems.forEach(item => {
                     const menuText = item.textContent.toLowerCase();
                     if (menuText.includes(searchTerm)) {
@@ -34,62 +85,59 @@
             });
         }
 
+        // ===================================================================
+        // FUNGSI TAB YANG DIPERBARUI
+        // ===================================================================
         function initTabs() {
             const tabs = document.querySelectorAll('#tabs .tab-link');
             const tabContents = document.querySelectorAll('.tab-content');
 
-            const showTab = (tabId) => {
+            // Definisikan kelas untuk setiap state agar sesuai dengan gambar
+            const activeClasses = ['bg-slate-200', 'text-blue-800', 'shadow-md'];
+            const inactiveClasses = ['text-gray-500', 'hover:bg-gray-100'];
+
+            function showTab(tabId) {
                 const targetTab = document.querySelector(`a.tab-link[data-tab="${tabId}"]`);
                 const targetContent = document.querySelector(`div.tab-content[data-tab-content="${tabId}"]`);
 
-                // Jika tab atau konten tidak ditemukan, kembali ke overview.
                 if (!targetTab || !targetContent) {
-                    if (tabId !== 'overview') {
-                        showTab('overview');
-                    }
+                    if (tabId !== 'overview') showTab('overview');
                     return;
                 }
 
-                // Nonaktifkan semua tab dan sembunyikan semua konten terlebih dahulu.
+                // 1. Set semua tab menjadi tidak aktif
                 tabs.forEach(t => {
-                    t.classList.remove('tab-active');
-                    t.classList.add('tab-inactive');
+                    t.classList.remove(...activeClasses);
+                    t.classList.add(...inactiveClasses);
                 });
+                // 2. Sembunyikan semua konten
                 tabContents.forEach(c => c.classList.add('hidden'));
 
-                // Aktifkan tab target dan tampilkan kontennya.
-                targetTab.classList.remove('tab-inactive');
-                targetTab.classList.add('tab-active');
+                // 3. Aktifkan tab dan konten yang ditargetkan
+                targetTab.classList.remove(...inactiveClasses);
+                targetTab.classList.add(...activeClasses);
                 targetContent.classList.remove('hidden');
             };
 
-            // Tambahkan event listener untuk setiap klik pada tab.
             tabs.forEach(tab => {
                 tab.addEventListener('click', function(e) {
                     e.preventDefault();
                     const tabId = this.dataset.tab;
-                    // Perbarui hash di URL tanpa me-reload halaman.
                     window.history.pushState(null, null, `#${tabId}`);
                     showTab(tabId);
                 });
             });
 
-            // --- LOGIKA KUNCI UNTUK MEMPERBAIKI MASALAH ---
-            // Saat halaman dimuat, periksa apakah ada hash di URL.
             if (window.location.hash) {
-                // Ambil ID tab dari hash (misal: dari "#contract" menjadi "contract").
                 const tabIdFromHash = window.location.hash.substring(1);
                 showTab(tabIdFromHash);
             } else {
-                // Jika tidak ada hash, tampilkan tab "overview" sebagai default.
                 showTab('overview');
             }
         }
 
-        /**
-         * Menginisialisasi semua fitur untuk tab "Database Contract".
-         */
         function initContractFeatures() {
+            // ... (kode fitur kontrak Anda, tidak perlu diubah)
             setupTableSearch('contractTableSearch', '#contractTableBody .contract-row');
             setupSelectAll('selectAllContractsCheckbox', '.contract-row-checkbox');
             setupModals();
@@ -102,6 +150,7 @@
         }
 
         function setupModals() {
+            // ... (kode modal Anda, tidak perlu diubah)
             const openInputModalBtn = document.getElementById('openContractInputModal');
             const inputModal = document.getElementById('contractInputModal');
             if (openInputModalBtn && inputModal) {
@@ -112,7 +161,6 @@
             }
             document.getElementById('closeContractInputModal')?.addEventListener('click', () => inputModal.classList.add('hidden'));
             document.getElementById('cancelContractInputModal')?.addEventListener('click', () => inputModal.classList.add('hidden'));
-
             const editModal = document.getElementById('contractEditModal');
             document.querySelectorAll('.edit-contract-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -122,7 +170,6 @@
             });
             document.getElementById('closeContractEditModal')?.addEventListener('click', () => editModal.classList.add('hidden'));
             document.getElementById('cancelContractEditModal')?.addEventListener('click', () => editModal.classList.add('hidden'));
-
             const deleteModal = document.getElementById('contractDeleteModal');
             document.querySelectorAll('.delete-contract-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -133,6 +180,7 @@
             document.getElementById('cancelContractDeleteModal')?.addEventListener('click', () => deleteModal.classList.add('hidden'));
         }
 
+        // ... (sisa fungsi Anda seperti setupTableSearch, handleContractEdit, dll. tetap di sini)
         function setupTableSearch(inputId, rowSelector) {
             const searchInput = document.getElementById(inputId);
             if (searchInput) {
@@ -144,7 +192,6 @@
                 });
             }
         }
-
         function setupSelectAll(selectAllId, rowCheckboxSelector) {
             const selectAll = document.getElementById(selectAllId);
             const exportBtn = document.getElementById('exportSelectedBtn');
@@ -158,18 +205,14 @@
                 });
             }
         }
-
         function setupExport(buttonId, checkboxSelector, exportUrl, itemType) {
             const exportBtn = document.getElementById(buttonId);
             const checkboxes = document.querySelectorAll(checkboxSelector);
-
             const toggleExportButton = () => {
                 const anyChecked = document.querySelectorAll(`${checkboxSelector}:checked`).length > 0;
                 if (exportBtn) exportBtn.disabled = !anyChecked;
             };
-
             checkboxes.forEach(checkbox => checkbox.addEventListener('change', toggleExportButton));
-
             if (exportBtn) {
                 exportBtn.addEventListener('click', function() {
                     const selectedIds = Array.from(document.querySelectorAll(`${checkboxSelector}:checked`)).map(cb => cb.dataset.id);
@@ -187,7 +230,6 @@
                 });
             }
         }
-
         function handleContractEdit(contractId) {
             const modal = document.getElementById('contractEditModal');
             const form = document.getElementById('contractEditForm');
@@ -204,7 +246,6 @@
                     modal.classList.remove('hidden');
                 });
         }
-
         function handleContractDelete(contractId) {
             const modal = document.getElementById('contractDeleteModal');
             const form = document.getElementById('contractDeleteForm');
@@ -212,7 +253,8 @@
             modal.classList.remove('hidden');
         }
 
-        // Jalankan inisialisasi.
+
+        // Jalankan semua fungsi inisialisasi.
         init();
     });
 </script>

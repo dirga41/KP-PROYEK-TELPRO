@@ -22,25 +22,51 @@
         /**
          * Mengatur sistem navigasi tab.
          */
+        /**
+         * Mengatur sistem navigasi tab dengan gaya yang lebih presisi.
+         */
         function initTabSystem() {
             const tabs = document.querySelectorAll('#tabs .tab-link');
             const tabContents = document.querySelectorAll('.tab-content');
 
+            // [MODIFIED] Kelas disesuaikan agar sama persis dengan gambar
+            const activeClasses = [
+                'bg-slate-200', // Warna latar lebih mendekati abu-abu di gambar
+                'text-blue-800', // Warna teks biru tua
+                'shadow-md', // Bayangan (shadow) yang lebih terlihat
+                'rounded-full' // Bentuk pil yang sepenuhnya bulat
+            ];
+
+            const inactiveClasses = [
+                'text-gray-500',
+                'hover:bg-gray-100',
+                'hover:text-gray-800'
+            ];
+
             function showTab(tabId) {
+                // Logika untuk fallback ke tab 'overview' jika hash tidak valid
                 const targetTab = document.querySelector(`[data-tab="${tabId}"]`);
+                if (!targetTab) {
+                    showTab('overview');
+                    return;
+                }
                 const targetContent = document.querySelector(`[data-tab-content="${tabId}"]`);
 
-                if (targetTab && targetContent) {
-                    tabs.forEach(item => {
-                        item.classList.remove('tab-active');
-                        item.classList.add('tab-inactive');
-                    });
-                    tabContents.forEach(content => {
-                        content.classList.add('hidden');
-                    });
+                // 1. Set semua tab menjadi tidak aktif
+                tabs.forEach(item => {
+                    item.classList.remove(...activeClasses);
+                    item.classList.add(...inactiveClasses);
+                });
 
-                    targetTab.classList.remove('tab-inactive');
-                    targetTab.classList.add('tab-active');
+                // 2. Sembunyikan semua konten
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+
+                // 3. Aktifkan tab dan konten yang ditargetkan
+                targetTab.classList.remove(...inactiveClasses);
+                targetTab.classList.add(...activeClasses);
+                if (targetContent) {
                     targetContent.classList.remove('hidden');
                 }
             }
@@ -49,11 +75,12 @@
                 tab.addEventListener('click', function(e) {
                     e.preventDefault();
                     const tabId = this.dataset.tab;
+                    window.history.pushState(null, null, `#${tabId}`);
                     showTab(tabId);
-                    window.location.hash = tabId;
                 });
             });
 
+            // Logika untuk memuat tab berdasarkan URL hash
             if (window.location.hash) {
                 const hash = window.location.hash.substring(1);
                 showTab(hash);
@@ -104,7 +131,7 @@
                         } else {
                             labelClass = 'bg-green-200 text-green-800'; // Hijau
                         }
-                        
+
                         // Menampilkan label dengan warna yang sesuai
                         el.innerHTML = `<span class="${labelClass} py-1 px-3 rounded-full text-xs">${daysLeft} hari</span>`;
                     }
@@ -155,8 +182,8 @@
 
                 jenisPengadaanInput.removeEventListener('change', toggleStatusPanjar);
                 jenisPengadaanInput.addEventListener('change', toggleStatusPanjar);
-                
-                toggleStatusPanjar(); 
+
+                toggleStatusPanjar();
             });
             setupModal('editModal', '.edit-btn', 'closeEditModal', 'cancelEditModal', handleProjectEdit);
             setupModal('viewModal', '.view-btn', 'closeViewModal', 'cancelViewModal', handleProjectView);
@@ -407,12 +434,12 @@
             const form = document.getElementById('editForm');
             const jenisPengadaanInput = document.getElementById('edit_jenis_pengadaan');
             const statusPanjarInput = document.getElementById('edit_status_panjar');
-            
+
             const formatDateForInput = (dateString) => {
                 if (!dateString) return '';
                 return new Date(dateString).toISOString().slice(0, 10);
             };
-            
+
             // [MODIFIED] Logic to disable/enable 'Status Panjar'
             const toggleStatusPanjarState = () => {
                 if (jenisPengadaanInput.value === 'mitra') {
@@ -422,7 +449,7 @@
                     statusPanjarInput.disabled = false;
                 }
             };
-            
+
             jenisPengadaanInput.removeEventListener('change', toggleStatusPanjarState); // Remove old listener to prevent duplicates
             jenisPengadaanInput.addEventListener('change', toggleStatusPanjarState);
 
@@ -433,11 +460,11 @@
                     form.action = `/projects/${projectId}`;
                     document.getElementById('edit_nilai_kontrak').value = parseFloat(data.nilai_kontrak);
                     document.getElementById('edit_status_progres').value = data.status_progres;
-                    
+
                     // Set values for 'Jenis Pengadaan' and 'Status Panjar'
                     jenisPengadaanInput.value = data.jenis_pengadaan || '';
                     statusPanjarInput.value = data.status_panjar || '';
-                    
+
                     // [MODIFIED] Set initial state for 'Status Panjar'
                     toggleStatusPanjarState();
 
@@ -499,9 +526,9 @@
                     const nilaiKontrak = new Intl.NumberFormat('id-ID').format(data.nilai_kontrak);
 
                     // [MODIFIED] Conditionally show 'Status Panjar'
-                    const statusPanjarHtml = data.jenis_pengadaan !== 'mitra' 
-                        ? `<p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>`
-                        : '';
+                    const statusPanjarHtml = data.jenis_pengadaan !== 'mitra' ?
+                        `<p><strong class="font-semibold text-gray-600">Status Panjar:</strong><br>${data.status_panjar || '-'}</p>` :
+                        '';
 
                     content.innerHTML = `
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -557,7 +584,7 @@
                                 },
                                 tooltip: {
                                     mode: 'nearest', // Diubah dari 'index' ke 'nearest'
-                                    intersect: true,   // Diubah ke true agar tooltip hanya muncul saat kursor tepat di atas titik
+                                    intersect: true, // Diubah ke true agar tooltip hanya muncul saat kursor tepat di atas titik
                                     displayColors: true,
                                     callbacks: {
                                         // Format tooltip agar lebih sesuai dengan contoh
@@ -568,7 +595,11 @@
                                             }
                                             if (context.parsed.y !== null) {
                                                 const date = new Date(context.parsed.y);
-                                                label += date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                                                label += date.toLocaleDateString('id-ID', {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    year: 'numeric'
+                                                });
                                             }
                                             return label;
                                         }
@@ -592,7 +623,7 @@
                                     borderColor: 'rgb(59, 130, 246)',
                                     backgroundColor: 'rgb(59, 130, 246)',
                                     fill: false,
-                                    tension: 0.2, 
+                                    tension: 0.2,
                                     pointRadius: 4, // Menampilkan titik secara default
                                     pointHoverRadius: 7, // Memperbesar titik saat hover
                                     pointHitRadius: 10,

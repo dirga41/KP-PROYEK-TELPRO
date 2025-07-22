@@ -1,5 +1,8 @@
 <div id="on-hand-content" data-tab-content="on-hand" class="tab-content hidden">
     <div class="flex justify-end items-center mb-4">
+        <button id="exportButton" class="ml-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Export</button>
+        <button id="openInputModal"
+            class="mr-4 ml-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Input</button>
         <div class="relative"><input id="projectTableSearch" type="text" placeholder="Search"
                 class="border rounded-lg py-2 px-8"><span
                 class="absolute left-2 top-2.5 text-gray-400"><svg class="w-5 h-5" fill="none"
@@ -7,9 +10,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg></span></div>
-        <button id="exportButton" class="ml-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Export</button>
-        <button id="openInputModal"
-            class="ml-4 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Input</button>
     </div>
     @if (session('success'))
     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-4"
@@ -68,9 +68,9 @@
                     </td>
                     <td class="py-2 px-3 text-center font-medium">
                         @if($project->current_crm_stage)
-                            <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full">{{ $project->current_crm_stage }}</span>
+                        <span class="bg-gray-200 text-gray-800 py-1 px-3 rounded-full">{{ $project->current_crm_stage }}</span>
                         @else
-                            <span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Belum ada input</span>
+                        <span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Belum ada input</span>
                         @endif
                     </td>
                     <td class="py-2 px-3 text-center">
