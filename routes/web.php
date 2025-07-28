@@ -8,7 +8,7 @@ use App\Http\Controllers\ProjectPlanController;
 use App\Http\Controllers\RkapRealizationController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\AssetController;
-
+use App\Http\Controllers\GsdAssetController; // <-- 1. IMPORT CONTROLLER BARU
 
 /*
 |--------------------------------------------------------------------------
@@ -30,12 +30,12 @@ Route::middleware(['auth'])->group(function () {
     // Rute dasbor umum
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // --- PERUBAHAN KUNCI ---
-    // Rute ini sekarang mengarah ke ContractController@index, tempat logika dasbor berada.
+    // Rute dasbor marketing dan project
     Route::get('/dashboard/marketing', [ContractController::class, 'index'])->name('dashboard.marketing');
-
-    // Rute dasbor lain (jika diperlukan)
     Route::get('/dashboard/project', [DashboardController::class, 'showProjectDashboard'])->name('dashboard.project');
+    
+    // Rute untuk Dasbor Monitoring Asset
+    Route::get('/dashboard/asset', [AssetController::class, 'index'])->name('dashboard.asset');
 
     // Rute untuk Project
     Route::get('/projects/export', [ProjectController::class, 'export'])->name('projects.export');
@@ -47,23 +47,33 @@ Route::middleware(['auth'])->group(function () {
 
     // Rute untuk RKAP
     Route::get('/rkaps/export', [RkapRealizationController::class, 'export'])->name('rkaps.export');
-    Route::resource('rkaps', RkapRealizationController::class);
+    Route::resource('rkaps', RkapRealizationController::class)->except('store', 'create');
 
+    // Rute untuk Aset Telkom
     Route::resource('assets', AssetController::class);
-    
-    // Rute untuk Dasbor Monitoring Asset
-    Route::get('/dashboard/asset', [AssetController::class, 'index'])->name('dashboard.asset');
 
+    // =================================================================
+    // BARU: Rute untuk Aset GSD
+    // =================================================================
+    // Route::resource akan secara otomatis membuat rute untuk:
+    // - gsd-assets.index   (GET)
+    // - gsd-assets.create  (GET)
+    // - gsd-assets.store   (POST)
+    // - gsd-assets.show    (GET)
+    // - gsd-assets.edit    (GET)
+    // - gsd-assets.update  (PUT/PATCH)
+    // - gsd-assets.destroy (DELETE)
+    Route::resource('gsd-assets', GsdAssetController::class);
+    // Anda juga bisa menambahkan rute export jika diperlukan
+    Route::get('/gsd-assets/export', [GsdAssetController::class, 'export'])->name('gsd-assets.export');
+    // =================================================================
 
     // Rute untuk redirect dari sidebar
-    Route::get('/dashboard/marketing/asset', function () {return redirect()->route('dashboard.asset');})->name('dashboard.marketing.asset');
-    // --- PERAPIHAN RUTE KONTRAK ---
+    Route::get('/dashboard/marketing/asset', function () {
+        return redirect()->route('dashboard.asset');
+    })->name('dashboard.marketing.asset');
 
-    // Route::get('/dashboard/marketing/asset', [ContractController::class, 'asset'])->name('dashboard.marketing.asset');
-
-    // Route::resource() sudah secara otomatis membuat rute untuk index, create, store, show, edit, update, dan destroy.
-    // Jadi, kita tidak perlu mendefinisikannya secara manual lagi. Cukup tambahkan rute custom seperti 'export'.
+    // Rute untuk Kontrak
     Route::get('/contracts/export', [ContractController::class, 'exportSelected'])->name('contracts.export');
     Route::resource('contracts', ContractController::class)->except(['index']);
-    // Kita tambahkan except(['index']) karena rute index utama sekarang adalah /dashboard/marketing
 });

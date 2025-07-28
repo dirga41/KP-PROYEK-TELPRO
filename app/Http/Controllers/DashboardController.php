@@ -18,41 +18,17 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Jika pengguna memiliki guard 'marketing', arahkan ke dasbor marketing.
+        // ... (kode lainnya tidak berubah)
         if (Auth::guard('marketing')->check()) {
             return redirect()->route('dashboard.marketing');
         }
-
-        // Jika pengguna memiliki guard 'project', arahkan ke dasbor project.
         if (Auth::guard('project')->check()) {
             return redirect()->route('dashboard.project');
         }
-
-        // Jika tidak ada guard yang cocok, kembalikan ke halaman login.
         return redirect()->route('login')->with('error', 'Tipe akun Anda tidak didukung.');
     }
 
-    /**
-     * Menampilkan dasbor untuk Marketing (halaman Kontrak).
-     * Rute: /dashboard/marketing
-     */
-    public function showMarketingDashboard()
-    {
-        $contracts = Contract::latest()->get();
-
-        return view('dashboards.marketing', [
-            'user' => Auth::user(),
-            'contracts' => $contracts,
-        ]);
-    }
-
-    public function showMarketingAssetDashboard()
-    {
-        // Anda bisa menambahkan logika untuk mengambil data aset di sini nanti.
-        return view('dashboards.marketing_asset', [
-            'user' => Auth::user(),
-        ]);
-    }
+    // ... (showMarketingDashboard & showMarketingAssetDashboard tidak berubah)
 
     /**
      * Menampilkan dasbor untuk Project (halaman Monitoring Aset).
@@ -63,7 +39,12 @@ class DashboardController extends Controller
         $user = Auth::user();
         $projects = Project::latest()->get();
         $projectPlans = ProjectPlan::latest()->get();
-        $rkaps = RkapRealization::orderBy('id')->get();
+
+        // [MODIFIKASI] Mengambil dan mengurutkan data RKAP berdasarkan urutan bulan yang benar.
+        $monthsOrder = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $rkaps = RkapRealization::all()->sortBy(function($model) use ($monthsOrder) {
+            return array_search($model->bulan, $monthsOrder);
+        });
 
         // --- LOGIKA DATA YANG DIPERTAHANKAN ---
 
@@ -73,13 +54,12 @@ class DashboardController extends Controller
             ->get()
             ->pluck('total_rkap', 'periode');
 
-        // 2. Jumlah & Nilai Project
+        // ... (sisa kode tidak berubah)
         $projectOnHandCount = $projects->count();
         $projectOnHandValue = $projects->sum('nilai_kontrak');
         $projectPlanningCount = $projectPlans->count();
         $projectPlanningValue = $projectPlans->sum('estimasi_nilai');
 
-        // 3. Status Project per Segment
         $statusCounts = Project::select('segment', 'status_progres', DB::raw('count(*) as total'))
             ->where('status_progres', '!=', 'tech meeting')
             ->groupBy('segment', 'status_progres')
@@ -94,20 +74,17 @@ class DashboardController extends Controller
                 $projectStatusBySegment[$segment][$status] = 0;
             }
         }
-
         foreach ($statusCounts as $count) {
             if (isset($projectStatusBySegment[$count->segment][$count->status_progres])) {
                 $projectStatusBySegment[$count->segment][$count->status_progres] = $count->total;
             }
         }
 
-        // 4. Mengirim semua data ke view
         return view('dashboards.project', [
             'user' => $user,
             'projects' => $projects,
             'projectPlans' => $projectPlans,
             'rkaps' => $rkaps,
-            // Variabel untuk overview
             'rkapSummary' => $rkapSummary,
             'projectOnHandCount' => $projectOnHandCount,
             'projectOnHandValue' => $projectOnHandValue,

@@ -56,6 +56,7 @@
                     li.appendChild(text);
                     legend.appendChild(li);
                 });
+
                 function resizeChart() {
                     const width = container.offsetWidth;
                     container.style.height = `${width}px`;
@@ -92,7 +93,6 @@
             const tabs = document.querySelectorAll('#tabs .tab-link');
             const tabContents = document.querySelectorAll('.tab-content');
 
-            // Definisikan kelas untuk setiap state agar sesuai dengan gambar
             const activeClasses = ['bg-slate-200', 'text-blue-800', 'shadow-md'];
             const inactiveClasses = ['text-gray-500', 'hover:bg-gray-100'];
 
@@ -105,27 +105,30 @@
                     return;
                 }
 
-                // 1. Set semua tab menjadi tidak aktif
                 tabs.forEach(t => {
                     t.classList.remove(...activeClasses);
                     t.classList.add(...inactiveClasses);
                 });
-                // 2. Sembunyikan semua konten
                 tabContents.forEach(c => c.classList.add('hidden'));
 
-                // 3. Aktifkan tab dan konten yang ditargetkan
                 targetTab.classList.remove(...inactiveClasses);
                 targetTab.classList.add(...activeClasses);
                 targetContent.classList.remove('hidden');
             };
 
             tabs.forEach(tab => {
+                // PERUBAHAN DI SINI
                 tab.addEventListener('click', function(e) {
-                    e.preventDefault();
+                    e.preventDefault(); // Mencegah default action
                     const tabId = this.dataset.tab;
-                    window.history.pushState(null, null, `#${tabId}`);
-                    showTab(tabId);
+
+                    // Hanya reload jika hash URL berbeda
+                    if (window.location.hash !== `#${tabId}`) {
+                        window.location.hash = tabId; // Atur hash di URL
+                        location.reload(); // Lalu refresh halaman
+                    }
                 });
+                // AKHIR PERUBAHAN
             });
 
             if (window.location.hash) {
@@ -192,6 +195,7 @@
                 });
             }
         }
+
         function setupSelectAll(selectAllId, rowCheckboxSelector) {
             const selectAll = document.getElementById(selectAllId);
             const exportBtn = document.getElementById('exportSelectedBtn');
@@ -205,6 +209,7 @@
                 });
             }
         }
+
         function setupExport(buttonId, checkboxSelector, exportUrl, itemType) {
             const exportBtn = document.getElementById(buttonId);
             const checkboxes = document.querySelectorAll(checkboxSelector);
@@ -230,6 +235,7 @@
                 });
             }
         }
+
         function handleContractEdit(contractId) {
             const modal = document.getElementById('contractEditModal');
             const form = document.getElementById('contractEditForm');
@@ -246,6 +252,7 @@
                     modal.classList.remove('hidden');
                 });
         }
+
         function handleContractDelete(contractId) {
             const modal = document.getElementById('contractDeleteModal');
             const form = document.getElementById('contractDeleteForm');

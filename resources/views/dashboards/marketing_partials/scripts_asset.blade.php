@@ -68,12 +68,18 @@
             };
 
             tabs.forEach(tab => {
+                // PERUBAHAN DI SINI
                 tab.addEventListener('click', e => {
-                    e.preventDefault();
+                    e.preventDefault(); // Mencegah default action dari link
                     const tabId = e.currentTarget.dataset.tab;
-                    window.history.pushState(null, null, `#${tabId}`);
-                    showTab(tabId);
+
+                    // Cek jika hash sudah sama, tidak perlu reload
+                    if (window.location.hash !== `#${tabId}`) {
+                        window.location.hash = tabId; // Set hash baru di URL
+                        location.reload(); // Paksa halaman untuk me-refresh
+                    }
                 });
+                // AKHIR PERUBAHAN
             });
 
             if (window.location.hash) {
@@ -83,6 +89,81 @@
             }
         }
 
+        // Modal Input GSD
+        document.getElementById('openGsdAssetInputModal')?.addEventListener('click', () => {
+            document.getElementById('gsdAssetInputModal').classList.remove('hidden');
+        });
+        document.getElementById('cancelGsdAssetInputModal')?.addEventListener('click', () => {
+            document.getElementById('gsdAssetInputModal').classList.add('hidden');
+        });
+        document.getElementById('closeGsdAssetInputModal')?.addEventListener('click', () => {
+            document.getElementById('gsdAssetInputModal').classList.add('hidden');
+        });
+        document.getElementById('closeGsdAssetEditModal')?.addEventListener('click', () => {
+            document.getElementById('gsdAssetEditModal').classList.add('hidden');
+        });
+
+        // Modal Edit GSD
+        document.querySelectorAll('.edit-gsd-asset-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const assetId = e.currentTarget.dataset.id;
+                const modal = document.getElementById('gsdAssetEditModal');
+                const form = document.getElementById('gsdAssetEditForm');
+
+                // Anda perlu membuat route dan fungsi controller baru untuk ini
+                fetch(`/gsd-assets/${assetId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        form.action = `/gsd-assets/${assetId}`;
+                        for (const key in data) {
+                            const input = document.getElementById(`edit_gsd_${key}`);
+                            if (input) input.value = data[key];
+                        }
+                        modal.classList.remove('hidden');
+                    });
+            });
+        });
+        document.getElementById('cancelGsdAssetEditModal')?.addEventListener('click', () => {
+            document.getElementById('gsdAssetEditModal').classList.add('hidden');
+        });
+
+        // Modal Delete GSD
+        document.querySelectorAll('.delete-gsd-asset-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                const assetId = e.currentTarget.dataset.id;
+                const form = document.getElementById('gsdAssetDeleteForm');
+                form.action = `/gsd-assets/${assetId}`; // Route untuk delete GSD
+                document.getElementById('gsdAssetDeleteModal').classList.remove('hidden');
+            });
+        });
+        document.getElementById('cancelGsdAssetDeleteModal')?.addEventListener('click', () => {
+            document.getElementById('gsdAssetDeleteModal').classList.add('hidden');
+        });
+
+        // Fungsi pencarian tabel aset GSD
+        document.getElementById('gsdAssetTableSearch')?.addEventListener('input', e => {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('#gsdAssetTableBody .gsd-asset-row').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Fungsi Select All & Export untuk GSD
+        const selectAllGsdCheckbox = document.getElementById('selectAllGsdAssetsCheckbox');
+        const rowGsdCheckboxes = document.querySelectorAll('.gsd-asset-row-checkbox');
+        const exportGsdBtn = document.getElementById('exportSelectedGsdAssetBtn');
+
+        selectAllGsdCheckbox?.addEventListener('change', function() {
+            rowGsdCheckboxes.forEach(cb => cb.checked = this.checked);
+            if (exportGsdBtn) exportGsdBtn.disabled = !this.checked;
+        });
+
+        rowGsdCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                if (exportGsdBtn) exportGsdBtn.disabled = !document.querySelectorAll('.gsd-asset-row-checkbox:checked').length;
+            });
+        });
+
         // Modal Input
         document.getElementById('openAssetInputModal')?.addEventListener('click', () => {
             document.getElementById('assetInputModal').classList.remove('hidden');
@@ -90,6 +171,19 @@
         document.getElementById('cancelAssetInputModal')?.addEventListener('click', () => {
             document.getElementById('assetInputModal').classList.add('hidden');
         });
+        document.getElementById('closeAssetInputModal')?.addEventListener('click', () => {
+            document.getElementById('assetInputModal').classList.add('hidden');
+        });
+        // Listener untuk tombol Batal Edit
+        document.getElementById('cancelAssetEditModal')?.addEventListener('click', () => {
+            document.getElementById('assetEditModal').classList.add('hidden');
+        });
+
+        // TAMBAHKAN INI: Listener untuk tombol 'X' (silang) Edit
+        document.getElementById('closeAssetEditModal')?.addEventListener('click', () => {
+            document.getElementById('assetEditModal').classList.add('hidden');
+        });
+
 
         // Modal Edit
         document.querySelectorAll('.edit-asset-btn').forEach(btn => {

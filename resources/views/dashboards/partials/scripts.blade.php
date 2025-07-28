@@ -10,7 +10,7 @@
          * Menginisialisasi semua fungsionalitas pada halaman.
          */
         function init() {
-            initTabSystem();
+            initTabSystem();   
             initSearch();
             initProjectFeatures();
             initProjectPlanFeatures();
@@ -29,12 +29,11 @@
             const tabs = document.querySelectorAll('#tabs .tab-link');
             const tabContents = document.querySelectorAll('.tab-content');
 
-            // [MODIFIED] Kelas disesuaikan agar sama persis dengan gambar
             const activeClasses = [
-                'bg-slate-200', // Warna latar lebih mendekati abu-abu di gambar
-                'text-blue-800', // Warna teks biru tua
-                'shadow-md', // Bayangan (shadow) yang lebih terlihat
-                'rounded-full' // Bentuk pil yang sepenuhnya bulat
+                'bg-slate-200',
+                'text-blue-800',
+                'shadow-md',
+                'rounded-full'
             ];
 
             const inactiveClasses = [
@@ -44,7 +43,6 @@
             ];
 
             function showTab(tabId) {
-                // Logika untuk fallback ke tab 'overview' jika hash tidak valid
                 const targetTab = document.querySelector(`[data-tab="${tabId}"]`);
                 if (!targetTab) {
                     showTab('overview');
@@ -52,18 +50,15 @@
                 }
                 const targetContent = document.querySelector(`[data-tab-content="${tabId}"]`);
 
-                // 1. Set semua tab menjadi tidak aktif
                 tabs.forEach(item => {
                     item.classList.remove(...activeClasses);
                     item.classList.add(...inactiveClasses);
                 });
 
-                // 2. Sembunyikan semua konten
                 tabContents.forEach(content => {
                     content.classList.add('hidden');
                 });
 
-                // 3. Aktifkan tab dan konten yang ditargetkan
                 targetTab.classList.remove(...inactiveClasses);
                 targetTab.classList.add(...activeClasses);
                 if (targetContent) {
@@ -72,12 +67,18 @@
             }
 
             tabs.forEach(tab => {
+                // ================== PERUBAHAN DI SINI ==================
                 tab.addEventListener('click', function(e) {
-                    e.preventDefault();
+                    e.preventDefault(); // Mencegah perilaku default tautan
                     const tabId = this.dataset.tab;
-                    window.history.pushState(null, null, `#${tabId}`);
-                    showTab(tabId);
+
+                    // Hanya refresh halaman jika tab yang diklik berbeda dari yang aktif
+                    if (window.location.hash !== `#${tabId}`) {
+                        window.location.hash = tabId; // Atur hash di URL
+                        location.reload(); // Kemudian, muat ulang halaman
+                    }
                 });
+                // ================== AKHIR PERUBAHAN ==================
             });
 
             // Logika untuk memuat tab berdasarkan URL hash
@@ -247,7 +248,8 @@
          * Inisialisasi fitur "RKAP Vs Realisasi".
          */
         function initRkapFeatures() {
-            setupModal('rkapInputModal', '#openRkapInputModal', 'closeRkapInputModal', 'cancelRkapInputModal');
+            // [MODIFIKASI] setupModal untuk input dihapus
+            // setupModal('rkapInputModal', '#openRkapInputModal', 'closeRkapInputModal', 'cancelRkapInputModal');
             setupModal('rkapEditModal', '.edit-rkap-btn', 'closeRkapEditModal', 'cancelRkapEditModal', handleRkapEdit);
             setupModal('rkapDeleteModal', '.delete-rkap-btn', null, 'cancelRkapDeleteModal', handleRkapDelete);
             setupExport('exportRkapButton', '.rkap-row-checkbox', '{{ route("rkaps.export") }}', 'RKAP');
@@ -715,12 +717,22 @@
                         return;
                     }
                     form.action = `/rkaps/${rkapId}`;
-                    document.getElementById('edit_rkap_bulan').value = data.bulan;
-                    document.getElementById('edit_rkap_periode').value = data.periode;
+
+                    // [MODIFIKASI] Mengisi nilai dan membuat field Bulan & Periode read-only
+                    const bulanInput = document.getElementById('edit_rkap_bulan');
+                    const periodeInput = document.getElementById('edit_rkap_periode');
+
+                    bulanInput.value = data.bulan;
+                    bulanInput.setAttribute('readonly', true); // Membuat field tidak bisa diedit
+
+                    periodeInput.value = data.periode;
+                    periodeInput.setAttribute('readonly', true); // Membuat field tidak bisa diedit
+
                     document.getElementById('edit_rkap_value').value = parseFloat(data.rkap_value);
                     document.getElementById('edit_project_2025_value').value = parseFloat(data.project_2025_value);
                     document.getElementById('edit_rev_co_project_2024_sap_value').value = parseFloat(data.rev_co_project_2024_sap_value);
                     document.getElementById('edit_project_2025_co_value').value = parseFloat(data.project_2025_co_value);
+
                     modal.classList.remove('hidden');
                 });
         }

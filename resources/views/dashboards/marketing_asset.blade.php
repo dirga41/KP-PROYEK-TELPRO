@@ -31,6 +31,7 @@
 </div>
 
 @include('dashboards.marketing_partials.modals_asset')
+@include('dashboards.marketing_partials.modals_gsd')
 @include('dashboards.marketing_partials.scripts_asset')
 
 </body>
