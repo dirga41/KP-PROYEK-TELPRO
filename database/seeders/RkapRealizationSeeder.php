@@ -31,5 +31,6 @@ class RkapRealizationSeeder extends Seeder
                 );
             }
         });
+        
     }
 }

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('project'); // Kolom untuk Nama Project
             $table->string('user'); // Kolom untuk User/PIC
             $table->string('lokasi'); // Kolom untuk Lokasi
-            $table->string('Mitra'); // Kolom untuk Lokasi
             $table->decimal('estimasi_nilai', 15, 2); // Kolom untuk Estimasi Nilai
             $table->text('update_info')->nullable(); // Kolom untuk Update (opsional)
             $table->timestamps(); // Kolom 'created_at' dan 'updated_at' otomatis
