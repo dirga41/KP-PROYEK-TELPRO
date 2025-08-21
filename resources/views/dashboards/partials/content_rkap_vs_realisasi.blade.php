@@ -39,7 +39,7 @@
                     <th class="py-3 px-6 text-left">RKAP</th>
                     <th class="py-3 px-6 text-left">PROJECT {{ $currentYear }}</th>
                     <th class="py-3 px-6 text-left">REV CO PROJECT {{ $previousYear }} SAP</th>
-                    <th class="py-3 px-6 text-left">PROJECT {{ $currentYear }} + CO PROJECT {{ $currentYear }}</th>
+                    <th class="py-3 px-6 text-left">PROJECT {{ $currentYear }} + REV CO PROJECT {{ $previousYear }} SAP</th>
                     <th class="py-3 px-6 text-center">Actions</th>
                 </tr>
             </thead>
